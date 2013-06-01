@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+	<style>
+	body {
+		font-family: verdana;
+		font-size: 11px;
+		
+	}
+	p.experiment
+	{
+		font-size:14px;
+		font-weight:bold;
+		color:#888888;
+	}
+
+	.table {
+		display: table
+	}
+	.row {
+		display: table-row;
+	}
+	.cell {
+		display: table-cell;
+	}
+	
+
+
+	.calendar {
+		width:100%;
+		height:100%;
+		border-collapse:collapse;
+		border: 1px solid black;
+		border-bottom:0px;
+		border-right:0px;
+	}
+	.group {
+		text-align:center;
+		font-weight: bold;
+		background-color: #eeeeee;
+		padding: 2px 0px 2px 0px;
+		border-right: 1px solid black;
+		border-bottom: 1px solid black;
+	}
+	.time {
+		text-align:center;
+		padding: 2px 0px 2px 0px;
+		border-right: 1px solid black;
+		border-bottom: 1px solid black;
+	}
+	.lane {
+		padding: 0px 0px 0px 10px;
+		height:50px;
+		vertical-align:middle;
+		border-right: 1px solid black;
+		border-bottom: 1px dashed #888888;
+	}
+	.close {
+		border-bottom: 1px solid black;
+	}
+	
+	</style>
+	
+	
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	</head>
+	
+	<body>
+	<div style="height:40px;"></div>
+	
+	<!--  basic layout - using divs -->
+	<!--
+		<div class="table calendar">
+			<div class="row">
+				<div class="cell time">
+				</div>
+				<div class="cell time">
+					8:00am
+				</div>
+				<div class="cell time">
+					9:00am
+				</div>
+				<div class="cell time">
+					10:00am
+				</div>
+				<div class="cell time">
+					11:00am
+				</div>
+				<div class="cell time">
+					12:00pm
+				</div>
+				<div class="cell time">
+					1:00pm
+				</div>
+				<div class="cell time">
+					2:00pm
+				</div>
+				<div class="cell time">
+					3:00pm
+				</div>
+				<div class="cell time">
+					4:00pm
+				</div>
+				<div class="cell time">
+					5:00pm
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="cell lane">
+					Staff 1
+				</div>
+			</div>
+			<div class="row">
+				<div class="cell lane">
+					Staff 2
+				</div>
+			</div>
+			<div class="row">
+				<div class="cell lane">
+					Staff 3
+				</div>
+			</div>
+			<div class="row">
+				<div class="cell lane">
+					Staff 4
+				</div>
+			</div>
+		</div>
+		<div style="height:80px;"></div>
+		-->
+		
+		<!-- basic layout - using tables -->
+		<p class="experiment">basic layout</p>
+		<table class="calendar" cellspacing="0" cellpadding="0">
+			<tr>
+				<td class="time" style="width:100px;"></td>
+				<td class="time">8:00am</td>
+				<td class="time">9:00am</td>
+				<td class="time">10:00am</td>
+				<td class="time">11:00am</td>
+				<td class="time">12:00pm</td>
+				<td class="time">1:00pm</td>
+				<td class="time">2:00pm</td>
+				<td class="time">3:00pm</td>
+				<td class="time">4:00pm</td>
+				<td class="time">5:00pm</td>
+			</tr>
+			<tr>
+				<td class="lane">Staff 1</td>
+				<td class="lane" colspan="10"></td>
+			</tr>
+						<tr>
+				<td class="lane">Staff 2</td>
+				<td class="lane" colspan="10"></td>
+			</tr>
+			<tr>
+				<td class="lane">Staff 3</td>
+				<td class="lane" colspan="10"></td>
+			</tr>
+			<tr>
+				<td class="lane close">Staff 4</td>
+				<td class="lane close" colspan="10"></td>
+			</tr>
+		</table>
+		<div style="height:80px;"></div>
+		
+		<!-- with subgroups -->
+		<p class="experiment">subgroups</p>
+		<table class="calendar">
+			<tr><td class="group" colspan="11">Los Angeles</td></tr>
+			<tr>
+				<td class="time" style="width:100px;"></td>
+				<td class="time">8:00am</td>
+				<td class="time">9:00am</td>
+				<td class="time">10:00am</td>
+				<td class="time">11:00am</td>
+				<td class="time">12:00pm</td>
+				<td class="time">1:00pm</td>
+				<td class="time">2:00pm</td>
+				<td class="time">3:00pm</td>
+				<td class="time">4:00pm</td>
+				<td class="time">5:00pm</td>
+			</tr>
+			
+			<tr>
+				<td class="lane">Staff 1</td>
+				<td class="lane" colspan="10"></td>
+			</tr>
+			<tr>
+				<td class="lane close">Staff 2</td>
+				<td class="lane close" colspan="10"></td>
+			</tr>
+			
+			<tr><td class="group" colspan="11">Seattle</td></tr>
+			<tr>
+				<td class="time"></td>
+				<td class="time">8:00am</td>
+				<td class="time">9:00am</td>
+				<td class="time">10:00am</td>
+				<td class="time">11:00am</td>
+				<td class="time">12:00pm</td>
+				<td class="time">1:00pm</td>
+				<td class="time">2:00pm</td>
+				<td class="time">3:00pm</td>
+				<td class="time">4:00pm</td>
+				<td class="time">5:00pm</td>
+			</tr>
+			<tr>
+				<td class="lane">Staff 2</td>
+				<td class="lane" colspan="10"></td>
+			</tr>
+			<tr>
+				<td class="lane">Staff 3</td>
+				<td class="lane" colspan="10"></td>
+			</tr>
+			<tr>
+				<td class="lane close">Staff 4</td>
+				<td class="lane close" colspan="10"></td>
+			</tr>
+		</table>
+		<div style="height:80px;"></div>
+		
+		
+		<!-- scrollable -->
+		<p class="experiment">scrollable</p>
+		<style>
+			.valign-text{
+			
+			}
+	
+	
+	
+		
+		</style>
+
+		<div style="position: relative; overflow:hidden; border-right:1px solid black; border-bottom:1px solid black;">
+			<!-- Absolute position group headers -->
+			<div class="group" style="position:absolute; width:100%; border: 1px solid black;">Los Angeles</div>
+			<div class="group" style="position:absolute; top:138px; width:100%; border: 1px solid black;">Seattle</div>
+			
+			<!-- Calendar -->
+			<div class="calendar table" style="width:100%; border-collapse:collapse; ">
+				<div class="row">
+					<!-- staff column -->
+					<div class="cell" style="vertical-align:top; width:100px">
+					
+						<!-- spacer for group and time lanes -->
+						<div class="group" style="border-right:0px;">&nbsp;</div>
+						<div class="time">&nbsp;</div>
+
+						<!-- staff lanes -->
+						<div class="lane"> 
+							Staff 1
+						</div>
+						<div class="lane close"> 
+							Staff 2
+						</div>
+						
+						<!-- spacer for group and time lanes -->
+						<div class="group" style="border-right:0px;">&nbsp;</div>
+						<div class="time" style="height:12px;">&nbsp;</div>
+						
+						<div class="lane"> 
+							Staff 2
+						</div>
+						<div class="lane"> 
+							Staff 3
+						</div>
+						<div class="lane close"> 
+							Staff 4
+						</div>
+					</div>
+					
+					<!-- scrollable column -->
+					<div class="cell" style="overflow:scroll; overflow-y:hidden;">
+						<table class="" style="border-collapse:collapse; width:150%;" cellspacing="0" cellpadding="0">
+							<!-- Los Angeles -->
+							<tr class="group" style="height:17px"><td colspan="11"></td></tr>
+							<tr>
+								<td class="time open">8:00am</td>
+								<td class="time">9:00am</td>
+								<td class="time">10:00am</td>
+								<td class="time">11:00am</td>
+								<td class="time">12:00pm</td>
+								<td class="time">1:00pm</td>
+								<td class="time">2:00pm</td>
+								<td class="time">3:00pm</td>
+								<td class="time">4:00pm</td>
+								<td class="time">5:00pm</td>
+								<td class="time">6:00pm</td>
+								<td class="time">7:00pm</td>
+								<td class="time">8:00pm</td>
+							</tr>
+							<tr><td class="lane" colspan="14"></td></tr>
+							<tr><td class="lane close" colspan="14"></td></tr>
+							
+							
+							<!-- Seattle -->
+							<tr class="group" style="height:17px"><td colspan="11"></td></tr>
+							<tr>
+								<td class="time open">8:00am</td>
+								<td class="time">9:00am</td>
+								<td class="time">10:00am</td>
+								<td class="time">11:00am</td>
+								<td class="time">12:00pm</td>
+								<td class="time">1:00pm</td>
+								<td class="time">2:00pm</td>
+								<td class="time">3:00pm</td>
+								<td class="time">4:00pm</td>
+								<td class="time">5:00pm</td>
+								<td class="time">6:00pm</td>
+								<td class="time">7:00pm</td>
+								<td class="time">8:00pm</td>
+							</tr>
+							<tr><td class="lane" colspan="14"></td></tr>
+							<tr><td class="lane" colspan="14"></td></tr>
+							<tr><td class="lane close" colspan="14"></td></tr>
+						</table>
+					</div>
+					
+				</div><!-- div class="row" -->
+				
+			</div>
+		</div>
+		<div style="height:80px;"></div>
+
+	</body>
+</html>
