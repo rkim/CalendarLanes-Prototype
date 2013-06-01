@@ -36,29 +36,11 @@
 
 	/* these values would be dynamically generated
 	   based on number of time lanes or something */
-	#base-calendar-grid {
+	#base-calendar-grid .calendar-data {
 		width:2450px;
 	}
-	#group-calendar-grid {
+	#group-calendar-grid .calendar-data {
 		width:2400px;
-	}
-
-	#base-calendar-grid .day-boundary,
-	#group-calendar-grid .day-boundary {
-		width:150px;
-		min-width:150px; 
-		border-left:1px solid black;
-		border-right:1px solid black;
-		border-bottom:0px;
-		background-color:#eeeeff;
-	}
-	#base-calendar-grid .day-boundary:hover,
-	#group-calendar-grid .day-boundary:hover {
-		background-color:#eeeeff;
-	}
-	#base-calendar-grid .day-start,
-	#group-calendar-grid .day-start {
-		border-left:0px;
 	}
 
 	/* calendar styles */
@@ -133,6 +115,29 @@
 		background-color:#eeeeee;
 	}
 	
+
+
+
+
+	.day-boundary {
+		width:150px;
+		min-width:150px; 
+		border-left:1px solid black;
+		border-right:1px solid black;
+		border-bottom:0px;
+		background-color:#eeeeff;
+	}
+	.day-boundary:hover {
+		background-color:#eeeeff;
+	}
+	.day-start {
+		border-left:0px;
+	}
+
+
+
+
+
 	/* formatting */
 	.valign-mid {
 		vertical-align:middle;
@@ -164,8 +169,8 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<script type="text/javascript" src="./scripts/jquery-1.10.0.min.js"></script>
-		<script type="text/javascript" src="./scripts/dragscrollable-rk.js"></script>
 		<script type="text/javascript" src="./scripts/jquery.kinetic.js"></script>
+		<script type="text/javascript" src="./scripts/infinite.calendar.js"></script>
 	</head>
 
 	<script type="text/javascript">
@@ -173,9 +178,6 @@
 		function xscroll() {
 			var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
 			var isChrome = !!window.chrome;  
-
-
-
 
 				if ($('#xscroll').prop('checked')) {
 					$('.scroller').css({"overflow-x":"auto", "overflow-y":"hidden"});
@@ -187,17 +189,18 @@
 		};
 
 		$(document).ready(function() {
-
-			// Initialize controls
+			// -----------------------------
+			// Initialize demo controls
+			//
 			$('#xscroll').click(function() {
 				xscroll();
 			});
 			xscroll();
-
-			// Setup scrolling
+			
+			// -----------------------------
+			// Attach kinetic scrolling
 			var tableWidth = 0;
 			var viewWidth = 0;
-
 			tableWidth = $('#base-calendar-grid').width();
 			viewWidth = $('#base-event-scroller').width();
 			$('#base-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
@@ -208,7 +211,7 @@
 			});
 			
 			tableWidth = $('#group-calendar-grid').width();
-			viewWidth = $('#group-event-scroller').width();			
+			viewWidth = $('#group-event-scroller').width();
 			$('#group-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
 			$('#group-event-scroller').kinetic({
 				y:false,
@@ -216,8 +219,14 @@
 				triggerHardware:true
 			});
 
+			// -----------------------------
+			// Attach circular scrolling
+			$('#base-event-scroller').infiniteScrollable();
+			$('#group-event-scroller').infiniteScrollable();
 
 		});	// $(document).ready(...)
+
+
 	</script>
 	
 	
@@ -269,7 +278,8 @@
 
 					<!-- scrollable column - start -->
 					<div id="base-event-scroller" class="cell scroller">
-						<div id="base-calendar-grid" class="table">
+						<div id="base-calendar-grid" class="table calendar-data">
+
 							<div class="row">
 								<div class="time day-start">...</div><div class="time">7:00am</div><div class="time">8:00am</div>
 								<div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
@@ -386,7 +396,7 @@
 
 					<!-- scrollable column - start -->
 					<div id="group-event-scroller" class="cell scroller">
-						<div id="group-calendar-grid" class="table">
+						<div id="group-calendar-grid" class="table calendar-data">
 							<!-- grouping -->
 							<div class="grouping row"></div>
 							<div class="row">
