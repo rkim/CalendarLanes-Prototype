@@ -1,20 +1,34 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	<style>
+	/* common styles */
+	*{
+		box-sizing:border-box;
+		-moz-box-sizing:border-box;
+		-webkit-box-sizing:border-box;
+	}
 	body {
 		font-family: verdana;
 		font-size: 11px;
 		
 	}
-	p.experiment
+	table, table tr td, table tr th{
+		padding: 0;
+		border-collapse:collapse;
+	}
+	p.title
 	{
 		font-size:14px;
 		font-weight:bold;
 		color:#888888;
 	}
 
+	
+	/* div table styles */
 	.table {
-		display: table
+		display: table;
+		border-collapse:collapse;
+		width:100%;
 	}
 	.row {
 		display: table-row;
@@ -22,306 +36,254 @@
 	.cell {
 		display: table-cell;
 	}
+
 	
-
-
+	/* calendar styles */
 	.calendar {
-		width:100%;
-		height:100%;
-		border-collapse:collapse;
-		border: 1px solid black;
+		overflow:hidden;
+		border:1px solid black;
 		border-bottom:0px;
-		border-right:0px;
+		position: relative;
 	}
 	.group {
 		text-align:center;
 		font-weight: bold;
-		background-color: #eeeeee;
-		padding: 2px 0px 2px 0px;
-		border-right: 1px solid black;
+
+		width:100%;
 		border-bottom: 1px solid black;
+		background-color: #eeeeee;
+		height:20px;
 	}
 	.time {
 		text-align:center;
-		padding: 2px 0px 2px 0px;
-		border-right: 1px solid black;
+		border-left: 1px dashed black;
 		border-bottom: 1px solid black;
-	}
-	.lane {
-		padding: 0px 0px 0px 10px;
-		height:50px;
-		vertical-align:middle;
-		border-right: 1px solid black;
-		border-bottom: 1px dashed #888888;
-	}
-	.close {
-		border-bottom: 1px solid black;
+		
+		height:17px;
+		width:100px;
+		min-width:100px;
 	}
 	
+	
+	.lane-col {
+		vertical-align:top;
+		width:100px;
+	}
+	.time-lane {
+		border-bottom:1px solid black;
+		border-right:1px solid black;
+		height:18px;		
+	}
+	.lane {
+		height:50px;
+		width:100px;
+		padding:0px;
+		margin:0px;
+		
+		border-right:1px solid black;
+		border-bottom:1px dashed #888888;
+		display:table;
+	}
+	.events {
+		padding: 0px;
+		height:50px;
+		border-bottom: 1px dashed #888888;
+	}
+	.scrollable {
+		cursor:e-resize;
+		overflow:hidden;
+	}
+	
+	/* formatting */
+	.valign-mid {
+		vertical-align:middle;
+		display:table-cell;
+	}
+	.pad10
+	{
+		padding-left:10px;
+	}
+	.last {
+		border-right:0px;
+	}
+	.bottom {
+		border-bottom: 1px solid black;
+	}
 	</style>
 	
 	
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+		<script type="text/javascript" src="./dragscrollable.js"></script>
 	</head>
 	
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#basic-scrollable').dragscrollable();
+			$('#group-scrollable').dragscrollable();
+			
+			var tableWidth = 2400;
+			var viewWidth = $('#basic-scrollable').width();
+			
+			$('#basic-scrollable').scrollLeft(tableWidth/2 - viewWidth/2);
+			$('#group-scrollable').scrollLeft(tableWidth/2 - viewWidth/2);
+		});
+	
+	</script>
+	
+	
 	<body>
-	<div style="height:40px;"></div>
-	
-	<!--  basic layout - using divs -->
-	<!--
-		<div class="table calendar">
-			<div class="row">
-				<div class="cell time">
-				</div>
-				<div class="cell time">
-					8:00am
-				</div>
-				<div class="cell time">
-					9:00am
-				</div>
-				<div class="cell time">
-					10:00am
-				</div>
-				<div class="cell time">
-					11:00am
-				</div>
-				<div class="cell time">
-					12:00pm
-				</div>
-				<div class="cell time">
-					1:00pm
-				</div>
-				<div class="cell time">
-					2:00pm
-				</div>
-				<div class="cell time">
-					3:00pm
-				</div>
-				<div class="cell time">
-					4:00pm
-				</div>
-				<div class="cell time">
-					5:00pm
-				</div>
-			</div>
-			
-			<div class="row">
-				<div class="cell lane">
-					Staff 1
-				</div>
-			</div>
-			<div class="row">
-				<div class="cell lane">
-					Staff 2
-				</div>
-			</div>
-			<div class="row">
-				<div class="cell lane">
-					Staff 3
-				</div>
-			</div>
-			<div class="row">
-				<div class="cell lane">
-					Staff 4
-				</div>
-			</div>
-		</div>
-		<div style="height:80px;"></div>
-		-->
+		<div style="height:40px;"></div>
 		
-		<!-- basic layout - using tables -->
-		<p class="experiment">basic layout</p>
-		<table class="calendar" cellspacing="0" cellpadding="0">
-			<tr>
-				<td class="time" style="width:100px;"></td>
-				<td class="time">8:00am</td>
-				<td class="time">9:00am</td>
-				<td class="time">10:00am</td>
-				<td class="time">11:00am</td>
-				<td class="time">12:00pm</td>
-				<td class="time">1:00pm</td>
-				<td class="time">2:00pm</td>
-				<td class="time">3:00pm</td>
-				<td class="time">4:00pm</td>
-				<td class="time">5:00pm</td>
-			</tr>
-			<tr>
-				<td class="lane">Staff 1</td>
-				<td class="lane" colspan="10"></td>
-			</tr>
-						<tr>
-				<td class="lane">Staff 2</td>
-				<td class="lane" colspan="10"></td>
-			</tr>
-			<tr>
-				<td class="lane">Staff 3</td>
-				<td class="lane" colspan="10"></td>
-			</tr>
-			<tr>
-				<td class="lane close">Staff 4</td>
-				<td class="lane close" colspan="10"></td>
-			</tr>
-		</table>
-		<div style="height:80px;"></div>
-		
-		<!-- with subgroups -->
-		<p class="experiment">subgroups</p>
-		<table class="calendar">
-			<tr><td class="group" colspan="11">Los Angeles</td></tr>
-			<tr>
-				<td class="time" style="width:100px;"></td>
-				<td class="time">8:00am</td>
-				<td class="time">9:00am</td>
-				<td class="time">10:00am</td>
-				<td class="time">11:00am</td>
-				<td class="time">12:00pm</td>
-				<td class="time">1:00pm</td>
-				<td class="time">2:00pm</td>
-				<td class="time">3:00pm</td>
-				<td class="time">4:00pm</td>
-				<td class="time">5:00pm</td>
-			</tr>
+		<!------------------------------------------------------------------
+		- basic layout - using tables
+		-------------------------------------------------------------------->
+		<p class="title">basic layout</p>
+		<div class="calendar">
+			<div class="table">
 			
-			<tr>
-				<td class="lane">Staff 1</td>
-				<td class="lane" colspan="10"></td>
-			</tr>
-			<tr>
-				<td class="lane close">Staff 2</td>
-				<td class="lane close" colspan="10"></td>
-			</tr>
-			
-			<tr><td class="group" colspan="11">Seattle</td></tr>
-			<tr>
-				<td class="time"></td>
-				<td class="time">8:00am</td>
-				<td class="time">9:00am</td>
-				<td class="time">10:00am</td>
-				<td class="time">11:00am</td>
-				<td class="time">12:00pm</td>
-				<td class="time">1:00pm</td>
-				<td class="time">2:00pm</td>
-				<td class="time">3:00pm</td>
-				<td class="time">4:00pm</td>
-				<td class="time">5:00pm</td>
-			</tr>
-			<tr>
-				<td class="lane">Staff 2</td>
-				<td class="lane" colspan="10"></td>
-			</tr>
-			<tr>
-				<td class="lane">Staff 3</td>
-				<td class="lane" colspan="10"></td>
-			</tr>
-			<tr>
-				<td class="lane close">Staff 4</td>
-				<td class="lane close" colspan="10"></td>
-			</tr>
-		</table>
-		<div style="height:80px;"></div>
-		
-		
-		<!-- scrollable -->
-		<p class="experiment">scrollable</p>
-		<style>
-			.valign-text{
-			
-			}
-	
-	
-	
-		
-		</style>
-
-		<div style="position: relative; overflow:hidden; border-right:1px solid black; border-bottom:1px solid black;">
-			<!-- Absolute position group headers -->
-			<div class="group" style="position:absolute; width:100%; border: 1px solid black;">Los Angeles</div>
-			<div class="group" style="position:absolute; top:138px; width:100%; border: 1px solid black;">Seattle</div>
-			
-			<!-- Calendar -->
-			<div class="calendar table" style="width:100%; border-collapse:collapse; ">
 				<div class="row">
-					<!-- staff column -->
-					<div class="cell" style="vertical-align:top; width:100px">
-					
-						<!-- spacer for group and time lanes -->
-						<div class="group" style="border-right:0px;">&nbsp;</div>
-						<div class="time">&nbsp;</div>
-
-						<!-- staff lanes -->
+					<!-- lane column - start -->
+					<div class="lane-col cell">
+						<div class="time-lane"></div>
 						<div class="lane"> 
-							Staff 1
+							<div class="valign-mid pad10">Staff 1</div>
 						</div>
-						<div class="lane close"> 
-							Staff 2
-						</div>
-						
-						<!-- spacer for group and time lanes -->
-						<div class="group" style="border-right:0px;">&nbsp;</div>
-						<div class="time" style="height:12px;">&nbsp;</div>
-						
-						<div class="lane"> 
-							Staff 2
+						<div class="lane">
+							<div class="valign-mid pad10">Staff 2</div>
 						</div>
 						<div class="lane"> 
-							Staff 3
+							<div class="valign-mid pad10">Staff 3</div>
 						</div>
-						<div class="lane close"> 
-							Staff 4
+						<div class="lane bottom"> 
+							<div class="valign-mid pad10">Staff 4</div>
 						</div>
 					</div>
-					
-					<!-- scrollable column -->
-					<div class="cell" style="overflow:scroll; overflow-y:hidden;">
-						<table class="" style="border-collapse:collapse; width:150%;" cellspacing="0" cellpadding="0">
-							<!-- Los Angeles -->
-							<tr class="group" style="height:17px"><td colspan="11"></td></tr>
+					<!-- lane column - end -->
+
+					<!-- scrollable column - start -->
+					<div id="basic-scrollable" class="cell scrollable" style="max-width:500px;">
+						<table class="table" style="width:2400px;" cellpadding="0" cellspacing="0">
 							<tr>
-								<td class="time open">8:00am</td>
-								<td class="time">9:00am</td>
-								<td class="time">10:00am</td>
-								<td class="time">11:00am</td>
-								<td class="time">12:00pm</td>
-								<td class="time">1:00pm</td>
-								<td class="time">2:00pm</td>
-								<td class="time">3:00pm</td>
-								<td class="time">4:00pm</td>
-								<td class="time">5:00pm</td>
-								<td class="time">6:00pm</td>
-								<td class="time">7:00pm</td>
-								<td class="time">8:00pm</td>
+								<!-- AM -->
+								<td class="time">12:00am</td><td class="time">1:00am</td>
+								<td class="time">2:00am</td><td class="time">3:00am</td>
+								<td class="time">4:00am</td><td class="time">5:00am</td>
+								<td class="time">6:00am</td><td class="time">7:00am</td>
+								<td class="time">8:00am</td><td class="time">9:00am</td>
+								<td class="time">10:00am</td><td class="time">11:00am</td>
+								<!-- PM -->
+								<td class="time">12:00pm</td><td class="time">1:00pm</td>
+								<td class="time">2:00pm</td><td class="time">3:00pm</td>
+								<td class="time">4:00pm</td><td class="time">5:00pm</td>
+								<td class="time">6:00pm</td><td class="time">7:00pm</td>
+								<td class="time">8:00pm</td><td class="time">9:00pm</td>
+								<td class="time">10:00pm</td><td class="time">11:00pm</td>
 							</tr>
-							<tr><td class="lane" colspan="14"></td></tr>
-							<tr><td class="lane close" colspan="14"></td></tr>
 							
-							
-							<!-- Seattle -->
-							<tr class="group" style="height:17px"><td colspan="11"></td></tr>
-							<tr>
-								<td class="time open">8:00am</td>
-								<td class="time">9:00am</td>
-								<td class="time">10:00am</td>
-								<td class="time">11:00am</td>
-								<td class="time">12:00pm</td>
-								<td class="time">1:00pm</td>
-								<td class="time">2:00pm</td>
-								<td class="time">3:00pm</td>
-								<td class="time">4:00pm</td>
-								<td class="time">5:00pm</td>
-								<td class="time">6:00pm</td>
-								<td class="time">7:00pm</td>
-								<td class="time">8:00pm</td>
-							</tr>
-							<tr><td class="lane" colspan="14"></td></tr>
-							<tr><td class="lane" colspan="14"></td></tr>
-							<tr><td class="lane close" colspan="14"></td></tr>
+							<tr><td class="events" colspan="24"></td></tr>
+							<tr><td class="events" colspan="24"></td></tr>
+							<tr><td class="events" colspan="24"></td></tr>
+							<tr><td class="events bottom" colspan="24"></td></tr>
 						</table>
 					</div>
+					<!-- scrollable column - end -->
 					
 				</div><!-- div class="row" -->
-				
+			</div><!-- div class="table" -->
+		</div>
+		<div style="height:80px;"></div>
+		
+		
+		
+		<!------------------------------------------------------------------
+		- layout with sub-groups
+		-------------------------------------------------------------------->
+		<p class="title">sub-groups</p>
+		<div class="calendar">
+			<!-- Absolute position group headers -->
+			<div class="group table" style="position:absolute;">
+				<div class="valign-mid">Los Angeles</div>
 			</div>
+			<div class="group table" style="position:absolute; top:138px;">
+				<div class="valign-mid">Seattle</div>
+			</div>
+			
+			<div class="table">
+				<div class="row">
+					<!-- lane column - start -->
+					<div class="lane-col cell">
+					
+						<!-- sub-group: Los Angeles -->
+						<div class="group"></div>
+						<div class="time-lane"></div>
+						<div class="lane"><div class="valign-mid pad10">Staff 1</div></div>
+						<div class="lane bottom"><div class="valign-mid pad10">Staff 2</div></div>
+						
+						<!-- sub-group: Seattle -->
+						<div class="group"></div>
+						<div class="time-lane"></div>
+						<div class="lane"> <div class="valign-mid pad10">Staff 2</div></div>
+						<div class="lane"><div class="valign-mid pad10">Staff 3</div></div>
+						<div class="lane bottom"><div class="valign-mid pad10">Staff 4</div></div>
+					</div>
+					<!-- lane column - end -->
+					
+					<!-- scrollable column -->
+					<div id="group-scrollable" class="cell scrollable" style="max-width:500px;">
+						<table class="table" style="width:2400px;">
+						
+							<!-- Los Angeles -->
+							<tr><td colspan="24"><div class="group"></div></td></tr>
+							<tr>
+								<!-- AM -->
+								<td class="time">12:00am</td><td class="time">1:00am</td>
+								<td class="time">2:00am</td><td class="time">3:00am</td>
+								<td class="time">4:00am</td><td class="time">5:00am</td>
+								<td class="time">6:00am</td><td class="time">7:00am</td>
+								<td class="time">8:00am</td><td class="time">9:00am</td>
+								<td class="time">10:00am</td><td class="time">11:00am</td>
+								<!-- PM -->
+								<td class="time">12:00pm</td><td class="time">1:00pm</td>
+								<td class="time">2:00pm</td><td class="time">3:00pm</td>
+								<td class="time">4:00pm</td><td class="time">5:00pm</td>
+								<td class="time">6:00pm</td><td class="time">7:00pm</td>
+								<td class="time">8:00pm</td><td class="time">9:00pm</td>
+								<td class="time">10:00pm</td><td class="time">11:00pm</td>
+							</tr>
+							<tr><td class="events" colspan="24"></td></tr>
+							<tr><td class="events bottom" colspan="24"></td></tr>
+							
+							<!-- Seattle -->
+							<tr><td colspan="24"><div class="group"></div></td></tr>
+							<tr>
+								<!-- AM -->
+								<td class="time">12:00am</td><td class="time">1:00am</td>
+								<td class="time">2:00am</td><td class="time">3:00am</td>
+								<td class="time">4:00am</td><td class="time">5:00am</td>
+								<td class="time">6:00am</td><td class="time">7:00am</td>
+								<td class="time">8:00am</td><td class="time">9:00am</td>
+								<td class="time">10:00am</td><td class="time">11:00am</td>
+								<!-- PM -->
+								<td class="time">12:00pm</td><td class="time">1:00pm</td>
+								<td class="time">2:00pm</td><td class="time">3:00pm</td>
+								<td class="time">4:00pm</td><td class="time">5:00pm</td>
+								<td class="time">6:00pm</td><td class="time">7:00pm</td>
+								<td class="time">8:00pm</td><td class="time">9:00pm</td>
+								<td class="time">10:00pm</td><td class="time">11:00pm</td>
+							</tr>
+							
+							<tr><td class="events" colspan="24"></td></tr>
+							<tr><td class="events" colspan="24"></td></tr>
+							<tr><td class="events bottom" colspan="24"></td></tr>
+						</table>
+					</div>
+					<!-- scrollable column - end -->
+					
+				</div><!-- div class="row" -->
+			</div><!-- div class="table" -->
 		</div>
 		<div style="height:80px;"></div>
 
