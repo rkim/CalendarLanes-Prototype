@@ -5,6 +5,18 @@
     The MIT License (MIT)
     Copyright (c) <2011> <Dave Taylor http://the-taylors.org>
 */
+
+/*!
+
+    Updated 27-Jul-2013
+    Roy Kim
+
+    Added a timeout window to the decelarate handler to
+    stop "ghost momentum" after drag motion had come to
+    a stop.
+*/
+
+
 /*global define,require */
 (function($){
 	'use strict';
@@ -18,6 +30,7 @@
             slowdown: 0.9,
             maxvelocity: 40,
             throttleFPS: 60,
+            decelerateTimeout: 75,
             movingClass: {
                 up: 'kinetic-moving-up',
                 down: 'kinetic-moving-down',
@@ -37,20 +50,20 @@
      * Provides requestAnimationFrame in a cross browser way.
      * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
      */
-    if ( !window.requestAnimationFrame ) {
+    if (!window.requestAnimationFrame) {
 
-        window.requestAnimationFrame = ( function() {
+        window.requestAnimationFrame = (function() {
 
             return window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
             window.msRequestAnimationFrame ||
-            function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
-                window.setTimeout( callback, 1000 / 60 );
+            function(
+                callback,   // function FrameRequestCallback
+                element) {  // DOMElement Element
+                window.setTimeout(callback, 1000 / 60); 
             };
-
         }());
-
     }
 
     // add touch checker to jQuery.support
@@ -58,13 +71,12 @@
     $.extend($.support, {
         touch: "ontouchend" in document
     });
-    var selectStart = function() { return false; };
 
+    var selectStart = function() { return false; };
     var decelerateVelocity = function(velocity, slowdown) {
         return Math.floor(Math.abs(velocity)) === 0 ? 0 // is velocity less than 1?
                : velocity * slowdown; // reduce slowdown
     };
-
     var capVelocity = function(velocity, max) {
         var newVelocity = velocity;
         if (velocity > 0) {
@@ -89,10 +101,10 @@
             .removeClass(settings.deceleratingClass.left)
             .removeClass(settings.deceleratingClass.right);
 
-        if (settings.velocity > 0) {
+        if (settings.velocityX > 0) {
             this.addClass(classes.right);
         }
-        if (settings.velocity < 0) {
+        if (settings.velocityX < 0) {
             this.addClass(classes.left);
         }
         if (settings.velocityY > 0) {
@@ -105,7 +117,7 @@
     };
 
     var stop = function($scroller, settings) {
-        settings.velocity = 0;
+        settings.velocityX = 0;
         settings.velocityY = 0;
         settings.decelerate = true;
         if (typeof settings.stopped === 'function') {
@@ -116,15 +128,17 @@
     /** do the actual kinetic movement */
     var move = function($scroller, settings) {
         var scroller = $scroller[0];
+
         // set scrollLeft
         if (settings.x && scroller.scrollWidth > 0){
-            scroller.scrollLeft = settings.scrollLeft = scroller.scrollLeft + settings.velocity;
-            if (Math.abs(settings.velocity) > 0) {
-                settings.velocity = settings.decelerate ?
-                    decelerateVelocity(settings.velocity, settings.slowdown) : settings.velocity;
+            scroller.scrollLeft = settings.scrollLeft = scroller.scrollLeft + settings.velocityX;
+
+            if (Math.abs(settings.velocityX) > 0) {
+                settings.velocityX = settings.decelerate ?
+                    decelerateVelocity(settings.velocityX, settings.slowdown) : settings.velocityX;
             }
         } else {
-            settings.velocity = 0;
+            settings.velocityX = 0;
         }
 
         // set scrollTop
@@ -144,7 +158,7 @@
             settings.moved.call($scroller, settings);
         }
 
-        if (Math.abs(settings.velocity) > 0 || Math.abs(settings.velocityY) > 0) {
+        if (Math.abs(settings.velocityX) > 0 || Math.abs(settings.velocityY) > 0) {
             // tick for next movement
             window.requestAnimationFrame(function(){ move($scroller, settings); });
         } else {
@@ -228,7 +242,7 @@
                 elementFocused
             ;
 
-            settings.velocity = 0;
+            settings.velocityX = 0;
             settings.velocityY = 0;
 
             // make sure we reset everything when mouse up
@@ -240,8 +254,8 @@
             $(document).mouseup(resetMouse).click(resetMouse);
 
             var calculateVelocities = function() {
-                settings.velocity    = capVelocity(prevXPos - xpos, settings.maxvelocity);
-                settings.velocityY   = capVelocity(prevYPos - ypos, settings.maxvelocity);
+                settings.velocityX = capVelocity(prevXPos - xpos, settings.maxvelocity);
+                settings.velocityY = capVelocity(prevYPos - ypos, settings.maxvelocity);
             };
             var useTarget = function(target) {
                 if ($.isFunction(settings.filterTarget)) {
@@ -251,7 +265,7 @@
             };
             var start = function(clientX, clientY) {
                 mouseDown = true;
-                settings.velocity = prevXPos = 0;
+                settings.velocityX = prevXPos = 0;
                 settings.velocityY = prevYPos = 0;
                 xpos = clientX;
                 ypos = clientY;
@@ -261,7 +275,12 @@
                     settings.decelerate = true;
                     calculateVelocities();
                     xpos = prevXPos = mouseDown = false;
-                    move($this, settings);
+
+                    // Check decelaration timeout window before proceeding with
+                    // decelaration.
+                    if (!lastMove || new Date() <= new Date(lastMove.getTime() + settings.decelerateTimeout)) {
+                        move($this, settings);
+                    }
                 }
             };
             var inputmove = function(clientX, clientY) {
@@ -275,7 +294,7 @@
                             $this.focus();
                         }
                         settings.decelerate = false;
-                        settings.velocity   = settings.velocityY  = 0;
+                        settings.velocityX  = settings.velocityY  = 0;
                         $this[0].scrollLeft = settings.scrollLeft = settings.x ? $this[0].scrollLeft - (clientX - xpos) : $this[0].scrollLeft;
                         $this[0].scrollTop  = settings.scrollTop  = settings.y ? $this[0].scrollTop - (clientY - ypos)  : $this[0].scrollTop;
                         prevXPos = xpos;
@@ -339,7 +358,7 @@
                     if (e.preventDefault) {e.preventDefault();}
                 },
                 inputClick: function(e){
-                    if (Math.abs(settings.velocity) > 0) {
+                    if (Math.abs(settings.velocityX) > 0) {
                         e.preventDefault();
                         return false;
                     }
