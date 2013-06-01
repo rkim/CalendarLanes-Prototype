@@ -1,180 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
-	<style>
-	/* common styles */
-	*{
-		box-sizing:border-box;
-		-moz-box-sizing:border-box;
-		-webkit-box-sizing:border-box;
-	}
-	body {
-		font-family:verdana;
-		font-size:11px;
-		
-	}
-	table, table tr td, table tr th{
-		padding:0;
-		border-collapse:collapse;
-	}
-	p.title
-	{
-		font-size:14px;
-		font-weight:bold;
-		color:#888888;
-	}
-
-	::-webkit-scrollbar {
-		height: 0em;
-	}
-
-	/* calendar sections */
-	#base-lane-column, #group-lane-column {
-		vertical-align:top;
-		width:100px;
-		align:left;
-	}
-
-	/* these values would be dynamically generated
-	   based on number of time lanes or something */
-	#base-calendar-grid .calendar-data {
-		width:2450px;
-	}
-	#group-calendar-grid .calendar-data {
-		width:2400px;
-	}
-
-	/* calendar styles */
-	.calendar {
-		overflow:hidden;
-		border:1px solid black;
-		border-bottom:0px;
-		position:relative;
-		min-width:400px;
-		max-width:1600px;
-	}
-	.scroller {
-		max-width:500px;
-		cursor:move;
-
-		/*
-		overflow:hidden;
-		overflow-x:auto; */
-    -webkit-overflow-scrolling:touch;
-	}
-
-	.grouping {
-		text-align:center;
-		font-weight:bold;
-		width:100%;
-		border-bottom:1px solid black;
-		background-color:#eeeeee;
-		height:20px;
-
-		-webkit-user-select:none;
-		-moz-user-select:none;
-		-ms-user-select:none;
-	}
-	.time, .time-lane{
-		text-align:center;
-		border-left:1px dashed black;
-		border-bottom:1px solid black;
-		height:17px;
-		width:100px;
-		min-width:100px;
-		display:table-cell;
-
-		-webkit-user-select:none;
-		-moz-user-select:none;
-		-ms-user-select:none;
-	}
-	.time-lane{
-		border-right:1px solid black;
-		border-left:0px;
-	}
-	.lane {
-		height:50px;
-		width:100px;
-		font-weight:bold;
-		color:#666666;
-		border-bottom:1px solid black;
-		border-right:1px solid black;
-		display:table-row;
-
-		-webkit-user-select:none;
-		-moz-user-select:none;
-		-ms-user-select:none;
-	}
-	.event {
-		padding:0px;
-		height:50px;
-		border-left:1px dashed #dddddd;
-		border-bottom:1px dashed #888888;
-		display:table-cell;
-	}
-	.event:hover {
-		background-color:#eeeeee;
-	}
-	
-
-
-
-
-	.day-boundary {
-		width:150px;
-		min-width:150px; 
-		border-left:1px solid black;
-		border-right:1px solid black;
-		border-bottom:0px;
-		background-color:#eeeeff;
-	}
-	.day-boundary:hover {
-		background-color:#eeeeff;
-	}
-	.day-start {
-		border-left:0px;
-	}
-
-
-
-
-
-	/* formatting */
-	.valign-mid {
-		vertical-align:middle;
-		display:table-cell;
-	}
-	.pad10
-	{
-		padding-left:10px;
-	}
-	.last {
-		border-right:0px;
-	}
-	.bottom {
-		border-bottom:1px solid black;
-	}
-	.table {
-		display:table;
-		border-collapse:collapse;
-		width:100%;
-	}
-	.row {
-		display:table-row;
-	}
-	.cell {
-		display:table-cell;
-	}
-	</style>
-
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<script type="text/javascript" src="./scripts/jquery-1.10.0.min.js"></script>
 		<script type="text/javascript" src="./scripts/jquery.kinetic.js"></script>
-		<script type="text/javascript" src="./scripts/infinite.calendar.js"></script>
+		<script type="text/javascript" src="./scripts/infinite.scheduler.js"></script>
+
+		<link href="./styles/lanes.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="./styles/event.occurrence.css" media="screen" rel="stylesheet" type="text/css">
 	</head>
 
 	<script type="text/javascript">
-
 		function xscroll() {
 			var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
 			var isChrome = !!window.chrome;  
@@ -191,7 +27,6 @@
 		$(document).ready(function() {
 			// -----------------------------
 			// Initialize demo controls
-			//
 			$('#xscroll').click(function() {
 				xscroll();
 			});
@@ -201,20 +36,25 @@
 			// Attach kinetic scrolling
 			var tableWidth = 0;
 			var viewWidth = 0;
+			
+			// #base-calendar-grid
 			tableWidth = $('#base-calendar-grid').width();
 			viewWidth = $('#base-event-scroller').width();
-			$('#base-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
+			 $('#base-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
 			$('#base-event-scroller').kinetic({
 				y:false,
+				cursor:'ew-resize',
 				maxvelocity: 55,
 				triggerHardware:true
 			});
 			
+			// #group-calendar-grid
 			tableWidth = $('#group-calendar-grid').width();
 			viewWidth = $('#group-event-scroller').width();
 			$('#group-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
 			$('#group-event-scroller').kinetic({
 				y:false,
+				cursor:'ew-resize',
 				maxvelocity: 55,
 				triggerHardware:true
 			});
@@ -223,10 +63,16 @@
 			// Attach circular scrolling
 			$('#base-event-scroller').infiniteScrollable();
 			$('#group-event-scroller').infiniteScrollable();
+			
+			
+			// -----------------------------
+			// Event handlers for Front Desk
+			// Scheduler
+			
+			
+
 
 		});	// $(document).ready(...)
-
-
 	</script>
 	
 	
@@ -234,11 +80,11 @@
 		<p class="title">notes</p>
 		<p style="padding-left:15px;">Not yet implemented:
 			<ul>
-				<li>Scrolling momentum and deceleration.</li>
+				<li style="text-decoration:line-through;">Scrolling momentum and deceleration.</li>
 				<li>Continuous scrolling functionality.<lie>
-				<li>Triggers and handlers on day boundaries.</li>
+				<li style="text-decoration:line-through;">Triggers and handlers on day boundaries.</li>
 				<li>Firefox support.</li>
-				<li>EventOccurrence overlays.</li>
+				<li>event-cellOccurrence overlays.</li>
 				<li>Sane CSS heirarchy.</li>
 			</ul>
 		</p>
@@ -249,17 +95,38 @@
 		<div style="padding-left:15px;">
 			<input id="xscroll" type="checkbox" name="xscroll" checked>enable scrollbars</input><br/>
 		</div>
-
 		<div style="height:40px;"></div>
 
+		<!-- 
+		- event occurrence
+		-->
+		<p class="title">event occurrence</p>
+		<p>An single event occurrence without a home (calendar) to live in.</p>
 		
-		<!------------------------------------------------------------------
+		<div class="event" style="position:absolute; height:90.0px; width: 150px;">
+			<div class="event_o service_color_1 type_class">
+				<a href="" class="fasted">
+				<span class="name_and_time">
+					<span class="full_time">
+						<span class="start_at">1PM</span>
+						<span class="dash">-</span>
+						<span class="end_at">2:30PM</span>
+					</span>
+					<span class="name"><strong>Class A</strong> w/Staff 1</span>
+					<span class="location">- Seattle</span>
+				</span>
+				</a>
+			</div>
+		</div>
+		<div style="height:120px"></div>
+
+		<!-- 
 		- base layout - using divs
-		-------------------------------------------------------------------->
+		-->
 		<p class="title">base layout</p>
 		<p style="padding-left:15px;">The proposed default display mode.<br/><br/>
-			Also contains a mockup of a continuous scroll calendar<br/>
-			(probably implemented as a circular array of time columns).</p>
+			Also contains a mockup of a continuous scroll calendar (probably <br/>
+			implemented as a circular array of time columns).</p>
 		<div id="base-calendar-container" class="calendar">
 			<div class="table">
 				<div class="row">
@@ -279,68 +146,145 @@
 					<!-- scrollable column - start -->
 					<div id="base-event-scroller" class="cell scroller">
 						<div id="base-calendar-grid" class="table calendar-data">
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 600px; top:20px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">1PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">2:30PM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 610px; top:30px; height:40px; width: 90px;">
+								<div class="event_o service_color_2 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">1PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">2PM</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/Staff 1</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 600px; top:120px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">1PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">2:30PM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 800px; top:70px; height:50px; width: 200px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">3PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">5PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 3</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>
+							</div>
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 300px; top:70px; height:50px; width: 200px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">10AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">12PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 3</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 300px; top:170px; height:50px; width: 200px;">
+								<div class="event_o service_color_4 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">10AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">12PM</span>
+										</span>
+										<span class=""><strong>Class D</strong> w/Staff 4</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 400px; top:180px; height:40px; width: 200px;">
+								<div class="event_o service_color_2 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">11AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">1PM</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/Staff 4</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>
+							</div>
 
 							<div class="row">
-								<div class="time day-start">...</div><div class="time">7:00am</div><div class="time">8:00am</div>
+								<div class="time day-start">7:00am</div><div class="time">8:00am</div>
 								<div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
 								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div>
 								<div class="time">3:00pm</div><div class="time">4:00pm</div><div class="time">5:00pm</div>
 								<div class="time">6:00pm</div><div class="time">7:00pm</div><div class="time">8:00pm</div>
-								
-								<div class="time day-boundary" style="border-bottom:1px solid black;">28-May</div>
-								
-								<div class="time day-start">6:00am</div><div class="time">7:00am</div><div class="time">8:00am</div>
-								<div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
-								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">...</div>
 							</div>
 							
-							<div class="row">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								
-								<div class="event day-boundary"></div>
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
+							<div class="row" style="position: relative;">
+								<div class="event-cell day-start"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
 							<div class="row">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-
-								<div class="event day-boundary"></div>
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
 							<div class="row">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-
-								<div class="event day-boundary"></div>
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
 							<div class="row bottom">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-
-								<div class="event day-boundary"></div>
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
 						</div>
 					</div>
@@ -352,26 +296,26 @@
 		<div style="height:40px;"></div>
 		
 
-		<!------------------------------------------------------------------
+		<!--
 		- grouping layout - using divs
-		-------------------------------------------------------------------->
+		-->
 		<p class="title">grouping layout using divs</p>
-		<p style="padding-left:15px;">Depending on analysis of the events to be displayed (event overlap,<br/>
+		<p style="padding-left:15px;">Depending on analysis of the event-cells to be displayed (event-cell overlap,<br/>
 		 legibility, etc. via heuristics yet to be created), lanes may be<br/>
-		 automatically be grouped by location (or possibly service or staff).<br/><br/>
+		 automatically grouped by location (or possibly service or staff).<br/><br/>
 		 
-		 Srolling to the day boundary here would trigger an ajax call to the<br/>
-		 controller for additional event data, and would result in a refresh<br/>
-		 of the event grid.<br/><br/>
+		 Scrolling near the scrollbar boundary will trigger an ajax call to the<br/>
+		 controller for additional event-cell data, and would result in rearrangement<br/>
+		 of the event-cell grid.<br/><br/>
 
-		 Also, I'm skeptical the classes/location breakout below would ever be<br/>
-		 useful, but it's something we could feasibly do without much trouble.</p>
+		 Also, I'm skeptical the classes/location breakout below will be useful,<br/>
+		 but it's something we could feasibly do without much trouble.</p>
 		<div id="group-calendar-container" class="calendar">
 			<!-- group labels -->
 			<div class="grouping table" style="position:absolute; text-align:center;">
 				<div class="valign-mid">Los Angeles</div>
 			</div>
-			<div class="grouping table" style="position:absolute; top:138px;">
+			<div class="grouping table" style="position:absolute; top:145px;">
 				<div class="valign-mid">Seattle</div>
 			</div>
 
@@ -380,8 +324,10 @@
 					<!-- lane column - start -->
 					<div id="group-lane-column" class="cell">
 						<div class="table">
+						
 							<div class="grouping row"></div>
 							<div class="time-lane"></div>
+							
 							<div class="lane"><div class="valign-mid pad10">Class A</div></div>
 							<div class="lane"><div class="valign-mid pad10">Class B</div></div>
 							
@@ -397,51 +343,232 @@
 					<!-- scrollable column - start -->
 					<div id="group-event-scroller" class="cell scroller">
 						<div id="group-calendar-grid" class="table calendar-data">
+							
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 400px; top:45px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">10AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">11:30AM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>	
+							</div>
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 550px; top:45px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">11:30AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">1PM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>	
+							</div>
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 700px; top:45px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">1PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">2:30PM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>	
+							</div>
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 850px; top:45px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">1:30pxPM</span>
+											<span class="dash">-</span>
+											<span class="end_at">3PM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>	
+							</div>
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 1000px; top:45px; height:50px; width: 150px;">
+								<div class="event_o service_color_1 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">4PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">5:30PM</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/Staff 1 & Staff 3</span>
+										<span class="location">- Los Angeles</span>
+									</span>
+								</div>	
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 400px; top:240px; height:50px; width: 100px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">10AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">11AM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 6</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+							
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 500px; top:240px; height:50px; width: 100px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">11AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">12PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 6</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 450px; top:250px; height:40px; width:100px;">
+								<div class="event_o service_color_4 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">10:30AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">11:30AM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 7</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 600px; top:240px; height:50px; width: 100px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">12PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">1PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 6</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 550px; top:250px; height:40px; width:100px;">
+								<div class="event_o service_color_2 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">11AM</span>
+											<span class="dash">-</span>
+											<span class="end_at">12PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 6</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 800px; top:240px; height:50px; width: 100px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">2PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">3PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 6</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+
+							<!-- event -->
+							<div class="event" style="position:absolute; left: 1000px; top:240px; height:50px; width: 100px;">
+								<div class="event_o service_color_3 type_class">
+									<span class="name_and_time">
+										<span class="full_time">
+											<span class="start_at">4PM</span>
+											<span class="dash">-</span>
+											<span class="end_at">5PM</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/Staff 6</span>
+										<span class="location">- Seattle</span>
+									</span>
+								</div>	
+							</div>
+						
+
+
+
 							<!-- grouping -->
 							<div class="grouping row"></div>
 							<div class="row">
-								<div class="time day-start">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
-								<div class="time">4:00am</div><div class="time">5:00am</div><div class="time">6:00am</div><div class="time">7:00am</div>
+								<div class="time">6:00am</div><div class="time">7:00am</div>
 								<div class="time">8:00am</div><div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
 								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div><div class="time">3:00pm</div>
-								<div class="time">4:00pm</div><div class="time">5:00pm</div><div class="time">6:00pm</div><div class="time">7:00pm</div>
-								<div class="time">8:00pm</div><div class="time">9:00pm</div><div class="time">10:00pm</div><div class="time">11:00pm</div>
+								<div class="time">4:00pm</div><div class="time">5:00pm</div><div class="time">6:00pm</div><div class="time">7:00pm</div><div class="time">8:00pm</div>
 							</div>
 							<div class="row">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
 							<div class="row bottom">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
+							
 							
 							<!-- grouping -->
 							<div class="grouping row"></div>
 							<div class="row">
-								<div class="time day-start">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
-								<div class="time">4:00am</div><div class="time">5:00am</div><div class="time">6:00am</div><div class="time">7:00am</div>
+								<div class="time">6:00am</div><div class="time">7:00am</div>
 								<div class="time">8:00am</div><div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
 								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div><div class="time">3:00pm</div>
-								<div class="time">4:00pm</div><div class="time">5:00pm</div><div class="time">6:00pm</div><div class="time">7:00pm</div>
-								<div class="time">8:00pm</div><div class="time">9:00pm</div><div class="time">10:00pm</div><div class="time">11:00pm</div>
+								<div class="time">4:00pm</div><div class="time">5:00pm</div><div class="time">6:00pm</div><div class="time">7:00pm</div><div class="time">8:00pm</div>
 							</div>
 							<div class="row">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+
 							</div>
 							<div class="row">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+
 							</div>
 							<div class="row bottom">
-								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event-cell day-start"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
+								<div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div><div class="event-cell"></div>
 							</div>
 						</div>
 					</div>

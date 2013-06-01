@@ -1,0 +1,149 @@
+@charset "US-ASCII";
+
+.event {
+  position: relative;
+  display: inline;
+}
+.event .event_o {
+  height: 100%;
+  padding: 5px;
+  line-height: 1em;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.event .event_o,
+.event .event_o a {
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+
+  text-decoration: none;
+  display: block;
+  position: relative;
+  font-size: 11px;
+  word-wrap: break-word;
+}
+.event .event_o .name {
+  margin-bottom: 3px;
+  display: inline-block;
+}
+.event .event_o .dash,
+.event .event_o .end_at {
+  display: none;
+}
+
+/*
+.event .type_class:hover,
+.event .type_appointment:hover {
+  margin-top: -5px;
+  padding: 15px !important;
+  z-index: 123456;
+  -webkit-transition: margin-top 0.1s;
+  -moz-transition: margin-top 0.1s;
+  -o-transition: margin-top 0.1s;
+  transition: margin-top 0.1s;
+  width: 300px;
+  line-height: 1.4em;
+  min-height: 120px;
+  height: auto;
+  left: -5px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0 3px 4px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 3px 4px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0 3px 4px;
+}
+
+.event .type_class:hover *,
+.event .type_appointment:hover * {
+  font-size: 16px;
+}
+
+/*
+
+
+/* Event Service Color: 1 */
+.event_o.service_color_1 {
+  background: rgba(14, 152, 209, 0.9);
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #21a0d4), color-stop(100%, #0e98d1));
+  background: -webkit-linear-gradient(#21a0d4, #0e98d1);
+  background: -moz-linear-gradient(#21a0d4, #0e98d1);
+  background: -o-linear-gradient(#21a0d4, #0e98d1);
+  background: linear-gradient(#21a0d4, #0e98d1);
+  border: 1px solid #0a729c;
+  -webkit-box-shadow: #6ec1e3 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  -moz-box-shadow: #6ec1e3 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  box-shadow: #6ec1e3 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  
+  color: #daeff8;
+  text-shadow: none;
+}
+.event_o.service_color_1 a {
+  color: #daeff8;
+  text-shadow: none;
+}
+
+/* Event Service Color: 2 */
+.event_o.service_color_2 {
+  background: rgba(99, 168, 81, 0.9);
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #6fae5e), color-stop(100%, #63a851));
+  background: -webkit-linear-gradient(#6fae5e, #63a851);
+  background: -moz-linear-gradient(#6fae5e, #63a851);
+  background: -o-linear-gradient(#6fae5e, #63a851);
+  background: linear-gradient(#6fae5e, #63a851);
+  border: 1px solid #4a7e3c;
+  -webkit-box-shadow: #a1ca96 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  -moz-box-shadow: #a1ca96 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  box-shadow: #a1ca96 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  
+  color: #e7f1e4;
+  text-shadow: none;
+}
+.event_o.service_color_2 a {
+  color: #e7f1e4;
+  text-shadow: none;
+}
+
+/* Event Service Color: 3 */
+.event_o.service_color_3 {
+  background: rgba(203, 95, 95, 0.9);
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #cf6b6b), color-stop(100%, #cb5f5f));
+  background: -webkit-linear-gradient(#cf6b6b, #cb5f5f);
+  background: -moz-linear-gradient(#cf6b6b, #cb5f5f);
+  background: -o-linear-gradient(#cf6b6b, #cb5f5f);
+  background: linear-gradient(#cf6b6b, #cb5f5f);
+  border: 1px solid #984747;
+  -webkit-box-shadow: #df9f9f 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  -moz-box-shadow: #df9f9f 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  box-shadow: #df9f9f 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  
+  color: #f7e7e7;
+  text-shadow: none;
+}
+.event_o.service_color_3 a {
+  color: #f7e7e7;
+  text-shadow: none;
+}
+
+
+/* Event Service Color: 4 */
+.event_o.service_color_4 {
+  background: rgba(207, 81, 176, 0.9);
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #d25eb6), color-stop(100%, #cf51b0));
+  background: -webkit-linear-gradient(#d25eb6, #cf51b0);
+  background: -moz-linear-gradient(#d25eb6, #cf51b0);
+  background: -o-linear-gradient(#d25eb6, #cf51b0);
+  background: linear-gradient(#d25eb6, #cf51b0);
+  border: 1px solid #9b3c84;
+  -webkit-box-shadow: #e296cf 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  -moz-box-shadow: #e296cf 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  box-shadow: #e296cf 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
+  
+  color: #f7e4f3;
+  text-shadow: none;
+}
+.event_o.service_color_4 a {
+  color: #f7e4f3;
+  text-shadow: none;
+}
