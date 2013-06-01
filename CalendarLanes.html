@@ -23,31 +23,63 @@
 		color:#888888;
 	}
 
+	::-webkit-scrollbar {
+		height: 0em;
+	}
+
 	/* calendar sections */
 	#base-lane-column, #group-lane-column {
 		vertical-align:top;
 		width:100px;
 		align:left;
 	}
-	#base-event-scroller, #group-event-scroller {
-		max-width:500px;
-		cursor:e-resize;
-		overflow:hidden;
+
+	/* these values would be dynamically generated
+	   based on number of time lanes or something */
+	#base-calendar-grid {
+		width:2450px;
 	}
-	#base-calendar-grid, #group-calendar-grid {
+	#group-calendar-grid {
 		width:2400px;
 	}
-	
-	
-	
+
+	#base-calendar-grid .day-boundary,
+	#group-calendar-grid .day-boundary {
+		width:150px;
+		min-width:150px; 
+		border-left:1px solid black;
+		border-right:1px solid black;
+		border-bottom:0px;
+		background-color:#eeeeff;
+	}
+	#base-calendar-grid .day-boundary:hover,
+	#group-calendar-grid .day-boundary:hover {
+		background-color:#eeeeff;
+	}
+	#base-calendar-grid .day-start,
+	#group-calendar-grid .day-start {
+		border-left:0px;
+	}
+
 	/* calendar styles */
 	.calendar {
 		overflow:hidden;
 		border:1px solid black;
 		border-bottom:0px;
 		position:relative;
-		max-width:1200px;
+		min-width:400px;
+		max-width:1600px;
 	}
+	.scroller {
+		max-width:500px;
+		cursor:move;
+
+		/*
+		overflow:hidden;
+		overflow-x:auto; */
+    -webkit-overflow-scrolling:touch;
+	}
+
 	.grouping {
 		text-align:center;
 		font-weight:bold;
@@ -55,6 +87,10 @@
 		border-bottom:1px solid black;
 		background-color:#eeeeee;
 		height:20px;
+
+		-webkit-user-select:none;
+		-moz-user-select:none;
+		-ms-user-select:none;
 	}
 	.time, .time-lane{
 		text-align:center;
@@ -64,6 +100,10 @@
 		width:100px;
 		min-width:100px;
 		display:table-cell;
+
+		-webkit-user-select:none;
+		-moz-user-select:none;
+		-ms-user-select:none;
 	}
 	.time-lane{
 		border-right:1px solid black;
@@ -74,9 +114,13 @@
 		width:100px;
 		font-weight:bold;
 		color:#666666;
-		border-bottom:1px solid #888888;
+		border-bottom:1px solid black;
 		border-right:1px solid black;
 		display:table-row;
+
+		-webkit-user-select:none;
+		-moz-user-select:none;
+		-ms-user-select:none;
 	}
 	.event {
 		padding:0px;
@@ -116,41 +160,97 @@
 		display:table-cell;
 	}
 	</style>
-	
-	
+
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
-		<script type="text/javascript" src="./dragscrollable.js"></script>
+		<script type="text/javascript" src="./scripts/jquery-1.10.0.min.js"></script>
+		<script type="text/javascript" src="./scripts/dragscrollable-rk.js"></script>
+		<script type="text/javascript" src="./scripts/jquery.kinetic.js"></script>
 	</head>
 
 	<script type="text/javascript">
+
+		function xscroll() {
+			var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+			var isChrome = !!window.chrome;  
+
+
+
+
+				if ($('#xscroll').prop('checked')) {
+					$('.scroller').css({"overflow-x":"auto", "overflow-y":"hidden"});
+				}
+				else {
+					$('.scroller').css({"overflow-x":"hidden"});
+					$('.calendar').css({"border-bottom":"0px"});
+				}
+		};
+
 		$(document).ready(function() {
-			var tableWidth = 2400;
-			var viewWidth = $('#base-event-scroller').width();
-			
-			
-			$('#base-event-scroller').dragscrollable({
-				dragYAxis: false
+
+			// Initialize controls
+			$('#xscroll').click(function() {
+				xscroll();
 			});
+			xscroll();
+
+			// Setup scrolling
+			var tableWidth = 0;
+			var viewWidth = 0;
+
+			tableWidth = $('#base-calendar-grid').width();
+			viewWidth = $('#base-event-scroller').width();
 			$('#base-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
-			
-			
-			$('#group-event-scroller').dragscrollable({
-				dragYAxis: false
+			$('#base-event-scroller').kinetic({
+				y:false,
+				maxvelocity: 55,
+				triggerHardware:true
 			});
+			
+			tableWidth = $('#group-calendar-grid').width();
+			viewWidth = $('#group-event-scroller').width();			
 			$('#group-event-scroller').scrollLeft(tableWidth/2 - viewWidth/2);
-		});
+			$('#group-event-scroller').kinetic({
+				y:false,
+				maxvelocity: 55,
+				triggerHardware:true
+			});
+
+
+		});	// $(document).ready(...)
 	</script>
 	
 	
 	<body>
+		<p class="title">notes</p>
+		<p style="padding-left:15px;">Not yet implemented:
+			<ul>
+				<li>Scrolling momentum and deceleration.</li>
+				<li>Continuous scrolling functionality.<lie>
+				<li>Triggers and handlers on day boundaries.</li>
+				<li>Firefox support.</li>
+				<li>EventOccurrence overlays.</li>
+				<li>Sane CSS heirarchy.</li>
+			</ul>
+		</p>
+		<p style="padding-left:15px">
+			Two-finger scrolling won't work unless scrollbars are enabled <br/>
+			(scrollbars are styled to be hidden in gecko and webkit browsers,<br/>
+			but will show in IE).</p>
+		<div style="padding-left:15px;">
+			<input id="xscroll" type="checkbox" name="xscroll" checked>enable scrollbars</input><br/>
+		</div>
+
 		<div style="height:40px;"></div>
+
 		
 		<!------------------------------------------------------------------
 		- base layout - using divs
 		-------------------------------------------------------------------->
-		<p class="title">base layout using divs</p>
+		<p class="title">base layout</p>
+		<p style="padding-left:15px;">The proposed default display mode.<br/><br/>
+			Also contains a mockup of a continuous scroll calendar<br/>
+			(probably implemented as a circular array of time columns).</p>
 		<div id="base-calendar-container" class="calendar">
 			<div class="table">
 				<div class="row">
@@ -168,36 +268,69 @@
 					<!-- lane column - end -->
 
 					<!-- scrollable column - start -->
-					<div id="base-event-scroller" class="cell">
+					<div id="base-event-scroller" class="cell scroller">
 						<div id="base-calendar-grid" class="table">
 							<div class="row">
-								<div class="time">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
-								<div class="time">4:00am</div><div class="time">5:00am</div><div class="time">6:00am</div><div class="time">7:00am</div>
-								<div class="time">8:00am</div><div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
-								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div><div class="time">3:00pm</div>
-								<div class="time">4:00pm</div><div class="time">5:00pm</div><div class="time">6:00pm</div><div class="time">7:00pm</div>
-								<div class="time">8:00pm</div><div class="time">9:00pm</div><div class="time">10:00pm</div><div class="time">11:00pm</div>
+								<div class="time day-start">...</div><div class="time">7:00am</div><div class="time">8:00am</div>
+								<div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
+								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div>
+								<div class="time">3:00pm</div><div class="time">4:00pm</div><div class="time">5:00pm</div>
+								<div class="time">6:00pm</div><div class="time">7:00pm</div><div class="time">8:00pm</div>
+								
+								<div class="time day-boundary" style="border-bottom:1px solid black;">28-May</div>
+								
+								<div class="time day-start">6:00am</div><div class="time">7:00am</div><div class="time">8:00am</div>
+								<div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
+								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">...</div>
 							</div>
 							
 							<div class="row">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								
+								<div class="event day-boundary"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 							<div class="row">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+
+								<div class="event day-boundary"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 							<div class="row">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+
+								<div class="event day-boundary"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 							<div class="row bottom">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+
+								<div class="event day-boundary"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 						</div>
 					</div>
@@ -206,13 +339,23 @@
 				</div><!-- div class="row" -->
 			</div><!-- div class="table" -->
 		</div>
-		<div style="height:80px;"></div>
-	
-	
+		<div style="height:40px;"></div>
+		
+
 		<!------------------------------------------------------------------
 		- grouping layout - using divs
 		-------------------------------------------------------------------->
 		<p class="title">grouping layout using divs</p>
+		<p style="padding-left:15px;">Depending on analysis of the events to be displayed (event overlap,<br/>
+		 legibility, etc. via heuristics yet to be created), lanes may be<br/>
+		 automatically be grouped by location (or possibly service or staff).<br/><br/>
+		 
+		 Srolling to the day boundary here would trigger an ajax call to the<br/>
+		 controller for additional event data, and would result in a refresh<br/>
+		 of the event grid.<br/><br/>
+
+		 Also, I'm skeptical the classes/location breakout below would ever be<br/>
+		 useful, but it's something we could feasibly do without much trouble.</p>
 		<div id="group-calendar-container" class="calendar">
 			<!-- group labels -->
 			<div class="grouping table" style="position:absolute; text-align:center;">
@@ -242,12 +385,12 @@
 					<!-- lane column - end -->
 
 					<!-- scrollable column - start -->
-					<div id="group-event-scroller" class="cell">
+					<div id="group-event-scroller" class="cell scroller">
 						<div id="group-calendar-grid" class="table">
 							<!-- grouping -->
 							<div class="grouping row"></div>
 							<div class="row">
-								<div class="time">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
+								<div class="time day-start">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
 								<div class="time">4:00am</div><div class="time">5:00am</div><div class="time">6:00am</div><div class="time">7:00am</div>
 								<div class="time">8:00am</div><div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
 								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div><div class="time">3:00pm</div>
@@ -255,12 +398,12 @@
 								<div class="time">8:00pm</div><div class="time">9:00pm</div><div class="time">10:00pm</div><div class="time">11:00pm</div>
 							</div>
 							<div class="row">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 							<div class="row bottom">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
@@ -268,7 +411,7 @@
 							<!-- grouping -->
 							<div class="grouping row"></div>
 							<div class="row">
-								<div class="time">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
+								<div class="time day-start">12:00am</div><div class="time">1:00am</div><div class="time">2:00am</div><div class="time">3:00am</div>
 								<div class="time">4:00am</div><div class="time">5:00am</div><div class="time">6:00am</div><div class="time">7:00am</div>
 								<div class="time">8:00am</div><div class="time">9:00am</div><div class="time">10:00am</div><div class="time">11:00am</div>
 								<div class="time">12:00pm</div><div class="time">1:00pm</div><div class="time">2:00pm</div><div class="time">3:00pm</div>
@@ -276,17 +419,17 @@
 								<div class="time">8:00pm</div><div class="time">9:00pm</div><div class="time">10:00pm</div><div class="time">11:00pm</div>
 							</div>
 							<div class="row">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 							<div class="row">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
 							<div class="row bottom">
-								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
+								<div class="event day-start"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 								<div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div><div class="event"></div>
 							</div>
@@ -297,5 +440,8 @@
 				</div><!-- div class="row" -->
 			</div><!-- div class="table" -->
 		</div>
+		<div style="height:80px;"></div>
+
+
 	</body>
 </html>
