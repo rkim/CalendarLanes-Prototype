@@ -36,10 +36,13 @@
 .event .event_o .end_at {
   display: none;
 }
-
-/*
+.event .stacked{
+  opacity:0.85;
+}
 .event .type_class:hover,
 .event .type_appointment:hover {
+  cursor:default;
+/*
   margin-top: -5px;
   padding: 15px !important;
   z-index: 123456;
@@ -55,14 +58,18 @@
   -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0 3px 4px;
   -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 3px 4px;
   box-shadow: rgba(0, 0, 0, 0.4) 0 3px 4px;
+*/
 }
-
+/*
 .event .type_class:hover *,
 .event .type_appointment:hover * {
   font-size: 16px;
 }
-
-/*
+*/
+.event .type_class:active,
+.event .type_appointment:active {
+  cursor:ew-resize;
+}
 
 
 /* Event Service Color: 1 */

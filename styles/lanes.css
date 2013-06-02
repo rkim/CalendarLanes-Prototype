@@ -41,6 +41,21 @@ p.title
   font-weight:bold;
 }
 
+
+.viewport{
+  max-width:1000px;
+  border:1px solid #c6c6c6;
+  padding:15px;
+  padding-bottom:30px;
+}
+.divider
+{
+  height:1px;
+  width:100%; 
+  background-color:#e6e6e6;
+  margin-bottom:15px;
+}
+
 /**
  * The following classes manage the layout
  * and flow of the Scheduler.
@@ -49,6 +64,10 @@ p.title
   border:1px solid #e6e6e6;
   position:relative;
   overflow:hidden;
+
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
 }
 .scheduler ::-webkit-scrollbar {
   height:0.0em;
@@ -67,17 +86,13 @@ p.title
   overflow-y: hidden;
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
 }
 .calendar-data
 {
   position:relative;
-  display:table;
   border-collapse:collapse;
+  z-index:10;
 }
-
 
 /**
  * Elements within the Scheduler
@@ -88,60 +103,68 @@ p.title
   border-bottom:1px solid #e6e6e6;
   border-right:1px solid #cfcfcf;
   display:table-row;
- 
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
 }
+
+/* subgroup */
 .subgroup-lane {
   text-align:center;
   font-weight:bold;
-  width:100%;
 
   background-color:#f2f2f2;
   position:absolute;
   display:table;
+  z-index:100;
 }
-
 .subgroup-spacer
 {
-  width:100%;
   display:table-row;
 }
 
-.time,
-.time-lane{
+/* time */
+.time-spacer,
+.time-lane,
+.time {
   text-align:center;
   font-size: 11px;
-  border-bottom:1px solid #cfcfcf;
+  font-weight:bold;
+  border-bottom:1px solid #c6c6c6;
 }
-.time {
-  display:table-cell;
-  background: -webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
-  background: -moz-linear-gradient(top, #f2f2f2, #e6e6e6);
-  background: -ms-linear-gradient(top, #f2f2f2, #e6e6e6);
+.time-spacer,
+.time-lane {
+  background:-webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background:-moz-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background:-ms-linear-gradient(top, #f2f2f2, #e6e6e6);
 }
 .time-lane {
   display:table-row;
-  border-left:0px;
+  position:relative;
 }
-.event-lane{
-  display:table-row;
+.time-spacer,
+.time-cell,
+.time {
+  display:table-cell;
 }
 
+/* events */
+.event-lane{
+  display:table-row;
+  border-bottom:1px solid #e6e6e6;
+}
 .event-cell {
   display:table-cell;
-  padding:0px;
+  border-left:1px solid #e6e6e6;
+}
+.mid {
   border-left:1px dashed #e6e6e6;
-  border-bottom:1px dashed #e6e6e6;
 }
-.event-cell:hover {
-  background-color:#eeeeee;
-}
+
 .day-start {
   border-left:0px;
 }
 
+.current-time{
+  z-index:-1;
+}
 /**
  * Currently unnecessary since continuous scroll
  * into prev/next days will not be enabled in the
@@ -172,35 +195,66 @@ p.title
    * This value will probably be set at render time.
    * Remember to add 2 pixels for the borders.
    *
-   */
   max-width:1502px;
+   */
+  width:100%;
 }
-.lane-column {
-  width:100px;
-}
-.lane,
-.event-lane,
-.event-cell {
-  height:50px;
-  width:100px;
-  min-width:100px;
-  max-width:100px;
-}
+
 .time,
-.time-lane {
+.time-cell,
+.time-spacer {
   height:20px;
 }
-.time{
-  width: 100px;
+.time {
+  width:100px;
   min-width:100px;
   max-width:100px;
+}
+
+.lane,
+.event-lane {
+  height:65px;
+}
+.event-lane {
+  width:100%;
+}
+
+.time-cell,
+.event-cell {
+  width:50px;
+  min-width:50px;
+  max-width:50px;
+}
+
+
+/**
+ * Set the width of the lane column
+ */
+.lane-column,
+.time-spacer,
+.subgroup-spacer,
+.lane {
+  width:80px;
+  min-width:80px;
+  max-width:80px;
+}
+.calendar-scroller {
+  margin-left:80px;
 }
 
 .subgroup-spacer,
 .subgroup-lane {
   height:25px;
+  width:100%;
 }
 
+.current-time
+{
+  position:absolute;
+  width:3px;
+  border:1px solid red;
+  height:100%;
+}
 /**
  * Commonly used page formatting styles.
  * While I think that it's generally bad
@@ -225,7 +279,9 @@ p.title
 .bottom {
   border-bottom:1px solid #e6e6e6;
 }
-
+.hide{
+  display:none;
+}
 
 .table {
   display:table;
