@@ -1,8 +1,10 @@
 @charset "US-ASCII";
 
 .event {
-  position: relative;
+  position:absolute; 
   display: inline;
+
+  padding:0.5px;
 }
 .event .event_o {
   height: 100%;

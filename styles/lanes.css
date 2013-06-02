@@ -1,4 +1,7 @@
-/* common styles */
+/**
+ * General styling for the prototype
+ *
+ */
 *{
   box-sizing:border-box;
   -moz-box-sizing:border-box;
@@ -16,138 +19,198 @@ body {
 table, table tr td, table tr th{
   padding:0;
   border-collapse:collapse;
+  table-layout:fixed;
+}
+p {
+  padding-left:15px;
 }
 p.title
 {
+  padding-left:0px;
   font-size:14px;
   font-weight:bold;
   color:#888888;
 }
-
 #content {
-	margin:15px;
+  margin:15px;
+}
+.strike {
+  text-decoration:line-through;
+}
+.strong {
+  font-weight:bold;
 }
 
-/* calendar sections */
-#base-lane-column, #group-lane-column {
-  vertical-align:top;
-  width:100px;
-  align:left;
-}
-
-/* these values would be dynamically generated
-   based on number of time lanes or something */
-#base-calendar-grid {
-  width:100%;
-}
-#group-calendar-grid .calendar-data {
-    width:100%;
-}
-
-/* calendar styles */
-.calendar {
-  overflow:hidden;
+/**
+ * The following classes manage the layout
+ * and flow of the Scheduler.
+ */
+.scheduler {
   border:1px solid #e6e6e6;
-  border-bottom:0px;
   position:relative;
+  overflow:hidden;
+}
+.scheduler ::-webkit-scrollbar {
+  height:0.0em;
+}
+.lane-column {
+  float:left;
+  margin-left:-100%;
+}
+.calendar-container {
+  float:left;
   width:100%;
-  max-width:100%;
+}
+.calendar-scroller {
+  margin-left:100px;
+  cursor:ew-resize;
+  overflow-y: hidden;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
 }
 .calendar-data
 {
   position:relative;
-}
-
-.scroller {
-  max-width:500px;
-  cursor:ew-resize;
-  overflow-y:hidden;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-.grouping {
-  text-align:center;
-  font-weight:bold;
-  width:100%;
-  background-color:#f2f2f2;
-    height:25px;
-
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-}
-.time, .time-lane{
-  text-align:center;
-  font-size: 11px;
-  border-bottom:1px solid #cfcfcf;
-  
-  height:20px;
-  width:100px;
-  min-width:100px;
-  max-width:100px;
-  display:table-cell;
-
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-
-  background: -webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
-  background: -moz-linear-gradient(top, #f2f2f2, #e6e6e6);
-  background: -ms-linear-gradient(top, #f2f2f2, #e6e6e6);
-}
-.time-lane{
-  border-left:0px;
+  display:table;
+  border-collapse:collapse;
 }
 
 
+/**
+ * Elements within the Scheduler
+ */
 .lane {
-  height:50px;
-  width:100px;
-  max-width:100px;
   font-weight:bold;
   color:#666666;
   border-bottom:1px solid #e6e6e6;
   border-right:1px solid #cfcfcf;
   display:table-row;
-
+ 
   -webkit-user-select:none;
   -moz-user-select:none;
   -ms-user-select:none;
 }
+.subgroup-lane {
+  text-align:center;
+  font-weight:bold;
+  width:100%;
+
+  background-color:#f2f2f2;
+  position:absolute;
+  display:table;
+}
+
+.subgroup-spacer
+{
+  width:100%;
+  display:table-row;
+}
+
+.time,
+.time-lane{
+  text-align:center;
+  font-size: 11px;
+  border-bottom:1px solid #cfcfcf;
+}
+.time {
+  display:table-cell;
+  background: -webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background: -moz-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background: -ms-linear-gradient(top, #f2f2f2, #e6e6e6);
+}
+.time-lane {
+  display:table-row;
+  border-left:0px;
+}
+.event-lane{
+  display:table-row;
+}
+
 .event-cell {
+  display:table-cell;
   padding:0px;
-  height:50px;
   border-left:1px dashed #e6e6e6;
   border-bottom:1px dashed #e6e6e6;
-  display:table-cell;
 }
 .event-cell:hover {
   background-color:#eeeeee;
-}
-
-
-
-.day-boundary {
-  width:150px;
-  min-width:150px; 
-  border-left:1px solid #e6e6e6;
-  border-right:1px solid #e6e6e6;
-  border-bottom:0px;
-  background-color:#eeeeff;
-}
-.day-boundary:hover {
-  background-color:#e7eff7;
 }
 .day-start {
   border-left:0px;
 }
 
+/**
+ * Currently unnecessary since continuous scroll
+ * into prev/next days will not be enabled in the
+ * initial CalendarLanes release.
+ *
+ .day-boundary {
+  border-left:1px solid #e6e6e6;
+  border-right:1px solid #e6e6e6;
+  border-bottom:0px;
+  background-color:#eeeeff;
+
+  width:150px;
+ }
+.day-boundary:hover {
+  background-color:#e7eff7;
+}
+*/
 
 
 
+/**
+ * Your one stop shop to set heights and widths for
+ * various scheduler elements
+ */
 
-/* formatting */
+ .scheduler {
+  /**
+   * This value will probably be set at render time.
+   * Remember to add 2 pixels for the borders.
+   *
+   */
+  max-width:1502px;
+}
+.lane-column {
+  width:100px;
+}
+.lane,
+.event-lane,
+.event-cell {
+  height:50px;
+  width:100px;
+  min-width:100px;
+  max-width:100px;
+}
+.time,
+.time-lane {
+  height:20px;
+}
+.time{
+  width: 100px;
+  min-width:100px;
+  max-width:100px;
+}
+
+.subgroup-spacer,
+.subgroup-lane {
+  height:25px;
+}
+
+/**
+ * Commonly used page formatting styles.
+ * While I think that it's generally bad
+ * practice to explicit classes like these,
+ * I've found them really useful for rapid
+ * prototyping...
+ *
+ * ...which is what I'm doing right now with
+ * this calendar-lane stuff.
+ */
 .valign-mid {
   vertical-align:middle;
   display:table-cell;
@@ -162,6 +225,8 @@ p.title
 .bottom {
   border-bottom:1px solid #e6e6e6;
 }
+
+
 .table {
   display:table;
   border-collapse:collapse;
@@ -172,5 +237,3 @@ p.title
 .cell {
   display:table-cell;
 }
-
-
