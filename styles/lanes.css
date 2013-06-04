@@ -6,6 +6,7 @@
   box-sizing:border-box;
   -moz-box-sizing:border-box;
   -webkit-box-sizing:border-box;
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
 }
 body {
   font-weight: normal;
@@ -122,31 +123,30 @@ p.title
 
 /* time */
 .time-spacer,
-.time-lane,
-.time {
+.time-cell {
+  border-bottom:1px solid #c6c6c6;
+}
+.time-spacer {
+  display:table-row;
+}
+.time-cell {
   text-align:center;
   font-size: 11px;
   font-weight:bold;
-  border-bottom:1px solid #c6c6c6;
-}
-.time-spacer,
-.time-lane {
+  display:table-cell;
+
   background:-webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
   background:-moz-linear-gradient(top, #f2f2f2, #e6e6e6);
   background:-ms-linear-gradient(top, #f2f2f2, #e6e6e6);
 }
 .time-lane {
-  display:table-row;
-  position:relative;
-}
-.time-spacer,
-.time-cell,
-.time {
-  display:table-cell;
+  position:absolute;
+  z-index:100;
 }
 
+
 /* events */
-.event-lane{
+.event-lane {
   display:table-row;
   border-bottom:1px solid #e6e6e6;
 }
@@ -157,14 +157,27 @@ p.title
 .mid {
   border-left:1px dashed #e6e6e6;
 }
-
 .day-start {
   border-left:0px;
 }
-
-.current-time{
-  z-index:-1;
+/*
+.event-cell:hover{
+  background-color:#daf3ff;
+  opacity:0.5;
 }
+*/  
+
+
+
+.current-time
+{
+  z-index:1;
+  position:absolute;
+  width:3px;
+  border:1px solid red;
+  height:100%;
+}
+
 /**
  * Currently unnecessary since continuous scroll
  * into prev/next days will not be enabled in the
@@ -200,46 +213,15 @@ p.title
   width:100%;
 }
 
-.time,
-.time-cell,
-.time-spacer {
+.time-spacer,
+.time-cell {
   height:20px;
 }
-.time {
+
+.time-lane .time-cell {
   width:100px;
   min-width:100px;
   max-width:100px;
-}
-
-.lane,
-.event-lane {
-  height:65px;
-}
-.event-lane {
-  width:100%;
-}
-
-.time-cell,
-.event-cell {
-  width:50px;
-  min-width:50px;
-  max-width:50px;
-}
-
-
-/**
- * Set the width of the lane column
- */
-.lane-column,
-.time-spacer,
-.subgroup-spacer,
-.lane {
-  width:80px;
-  min-width:80px;
-  max-width:80px;
-}
-.calendar-scroller {
-  margin-left:80px;
 }
 
 .subgroup-spacer,
@@ -248,13 +230,35 @@ p.title
   width:100%;
 }
 
-.current-time
-{
-  position:absolute;
-  width:3px;
-  border:1px solid red;
-  height:100%;
+.lane,
+.event-lane {
+  height:65px;
+  width:100%;
 }
+.event-cell {
+  width:50px;
+  min-width:50px;
+  max-width:50px;
+  z-index:-1000;
+
+}
+
+/**
+ * Set the width of the lane column
+ */
+.lane-column,
+.lane-column .time-cell,
+.lane-column .subgroup-spacer {
+  width:80px;
+  min-width:80px;
+  max-width:80px;
+}
+.calendar-scroller {
+  margin-left:80px;
+}
+
+
+
 /**
  * Commonly used page formatting styles.
  * While I think that it's generally bad

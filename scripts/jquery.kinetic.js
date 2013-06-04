@@ -25,6 +25,8 @@
             cursor: 'move',
             decelerate: true,
             triggerHardware: false,
+            useNativeTouchHandler: true,
+            propagateInput: true,
             y: true,
             x: true,
             slowdown: 0.9,
@@ -181,7 +183,7 @@
 
     var attachListeners = function($this, settings) {
         var element = $this[0];
-        if ($.support.touch) {
+        if (!settings.useNativeTouchHandler && $.support.touch) {
             $this.bind('touchstart', settings.events.touchStart)
                 .bind('touchend', settings.events.inputEnd)
                 .bind('touchmove', settings.events.touchMove)
@@ -201,7 +203,7 @@
     };
     var detachListeners = function($this, settings) {
         var element = $this[0];
-        if ($.support.touch) {
+        if (!settings.useNativeTouchHandler && $.support.touch) {
             $this.unbind('touchstart', settings.events.touchStart)
                 .unbind('touchend', settings.events.inputEnd)
                 .unbind('touchmove', settings.events.touchMove);
@@ -319,7 +321,9 @@
                     if (useTarget(e.target)) {
                         touch = e.originalEvent.touches[0];
                         start(touch.clientX, touch.clientY);
-                        e.stopPropagation();
+                        if (!settings.propagateInput) {
+                           e.stopPropagation();
+                        }
                     }
                 },
                 touchMove: function(e){
@@ -327,6 +331,7 @@
                     if (mouseDown) {
                         touch = e.originalEvent.touches[0];
                         inputmove(touch.clientX, touch.clientY);
+                        if ($this[0].scrollLeft)
                         if (e.preventDefault) {e.preventDefault();}
                     }
                 },
@@ -337,7 +342,9 @@
                         if (e.target.nodeName === 'IMG'){
                             e.preventDefault();
                         }
-                        e.stopPropagation();
+                        if (!settings.propagateInput) {
+                           e.stopPropagation();
+                        }
                     }
                 },
                 inputEnd: function(e){
