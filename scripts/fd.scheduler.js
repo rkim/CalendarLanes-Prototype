@@ -21,7 +21,6 @@
  * certain CSS classes and so forth. Oh well.
  *
  */
-	
 	var DEFAULTS = {
 		horizLayout: true,
 		gridHoverOn: true,
@@ -33,20 +32,57 @@
 	};
 	var SETTINGS = "fdScheduler-Settings";
 
+	// Bind event handlers for event occurrences
+
 
 	// Render the grid
 	var renderCalendarGrid = function($this, settings) {
+		var elementId = $this.attr('id');
+
+		// Bail for subgroups for now
+		if (elementId === "subgroups")
+			return;
+
 		
+		// Setup calendar structure
+		var $calendarContainer = jQuery('<div/>', {
+			class: 'calendar-container'
+		});
+		var $calendarScroller = jQuery('<div/>', {
+			class: 'calendar-scroller'
+		});
+		var $calendarData = jQuery ('<div/>', {
+			class: 'calendar-data'
+		});
+		var $laneColumn = jQuery('<div/>', {
+			class: 'lane-column'
+		});
+
+		$this.append($calendarContainer);
+		$calendarContainer.append($calendarScroller);
+		$calendarScroller.append($calendarData);
+		$this.append($laneColumn);
+
+		// Note :: rkim :: 04-Jun-2013
+		// These load elements will be quickly replaced
+		// by js rendering routines off JSON data. 
+		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.lanes.html',
+			function(data){
+				$laneColumn.append(data);
+			}
+		);
+		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.events.html',
+			function(data){
+				$calendarData.append(data);
+
+			}
+		);
+		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.calendar.html',
+			function(data){
+				$calendarData.append(data);
+			}
+		);
 	};
-
-
-
-
-
-
-
-
-
 
 
 	// Initialize Scheduler 
@@ -62,11 +98,6 @@
 
 			// Extend default settings
 			var settings = $.extend({}, DEFAULTS, options);
-
-
-
-
-
 
 			// Handlers for most events that I think will be
 			// relevant. Pretty sure some of these will not
@@ -101,6 +132,7 @@
 				}
 			};
 
+			// Hardware acceleration
 			$this.data(SETTINGS, settings);
 			if (settings.hardwareAcceleration) {
 				$this.css({
@@ -110,31 +142,16 @@
 				});
 			}
 
-
 			// Genereate the grid
-
-			// Populate events
+			renderCalendarGrid($this, settings);
 
 			// Bind event Handlers
 			$this.find('.event').click(function(e) {
 				console.log(e.clientX + ", " + e.clientY);
 			});
 
-
-
-
-
-
-
-
-
-
-
 		});	// this.each(function...)
 	};
-
-
-
 
 	// Register fdScheduler 
 	$.fn.fdScheduler = function(options) {
@@ -153,7 +170,6 @@
  * JSON Object: Event Occurence
  *
  *
- */
  var eventOccurrence =
  {
 	id : "",
@@ -175,3 +191,4 @@
 		name : ""
 	}
  };
+ */
