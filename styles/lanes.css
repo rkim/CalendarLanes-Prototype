@@ -17,11 +17,6 @@ body {
   margin:0;
   padding:0;
 }
-table, table tr td, table tr th{
-  padding:0;
-  border-collapse:collapse;
-  table-layout:fixed;
-}
 p {
   padding-left:15px;
 }
@@ -31,6 +26,10 @@ p.title
   font-size:14px;
   font-weight:bold;
   color:#888888;
+}
+div {
+  padding:0px;
+  margin:0px;
 }
 #content {
   margin:15px;
@@ -98,11 +97,13 @@ p.title
 /**
  * Elements within the Scheduler
  */
+.lane-column{
+  border-right:1px solid #cfcfcf;
+}
 .lane {
   font-weight:bold;
   color:#666666;
   border-bottom:1px solid #e6e6e6;
-  border-right:1px solid #cfcfcf;
   display:table-row;
 }
 
@@ -126,9 +127,6 @@ p.title
 .time-cell {
   border-bottom:1px solid #c6c6c6;
 }
-.time-spacer {
-  display:table-row;
-}
 .time-cell {
   text-align:center;
   font-size: 11px;
@@ -144,31 +142,34 @@ p.title
   z-index:100;
 }
 
-
-/* events */
-.event-lane {
-  display:table-row;
+/* calendar grid */
+.grid-lane{
   border-bottom:1px solid #e6e6e6;
+  display:table-row;
 }
-.event-cell {
+.grid-lane .grid {
   display:table-cell;
   border-left:1px solid #e6e6e6;
 }
-.mid {
+.grid-lane .mid {
   border-left:1px dashed #e6e6e6;
 }
-.day-start {
+.grid-lane .start {
   border-left:0px;
 }
 /*
-.event-cell:hover{
+.grid:hover{
   background-color:#daf3ff;
   opacity:0.5;
 }
 */  
 
 
-
+/* events */
+.event-lane {
+  position:absolute;
+  display:table-row;
+}
 .current-time
 {
   z-index:1;
@@ -231,11 +232,12 @@ p.title
 }
 
 .lane,
-.event-lane {
+.event-lane,
+.grid {
   height:65px;
-  width:100%;
 }
-.event-cell {
+
+.grid {
   width:50px;
   min-width:50px;
   max-width:50px;
@@ -247,6 +249,7 @@ p.title
  * Set the width of the lane column
  */
 .lane-column,
+.lane-column .lane,
 .lane-column .time-cell,
 .lane-column .subgroup-spacer {
   width:80px;

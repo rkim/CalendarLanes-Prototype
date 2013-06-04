@@ -43,6 +43,7 @@
 		if (elementId === "subgroups")
 			return;
 
+	/*
 		
 		// Setup calendar structure
 		var $calendarContainer = jQuery('<div/>', {
@@ -66,6 +67,7 @@
 		// Note :: rkim :: 04-Jun-2013
 		// These load elements will be quickly replaced
 		// by js rendering routines off JSON data. 
+
 		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.lanes.html',
 			function(data){
 				$laneColumn.append(data);
@@ -82,8 +84,9 @@
 				$calendarData.append(data);
 			}
 		);
+	*/
+	
 	};
-
 
 	// Initialize Scheduler 
 	var initializeScheduler = function(options) {
