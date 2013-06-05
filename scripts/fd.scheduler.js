@@ -43,49 +43,83 @@
 		if (elementId === "subgroups")
 			return;
 
-	/*
 		
+		// ----------------------------------
+		// Step 1: 
 		// Setup calendar structure
-		var $calendarContainer = jQuery('<div/>', {
-			class: 'calendar-container'
-		});
-		var $calendarScroller = jQuery('<div/>', {
-			class: 'calendar-scroller'
-		});
-		var $calendarData = jQuery ('<div/>', {
-			class: 'calendar-data'
-		});
-		var $laneColumn = jQuery('<div/>', {
-			class: 'lane-column'
-		});
+		// ----------------------------------
+		var $calendarContainer = jQuery('<div/>', {class: 'calendar-container'});
+		var $calendarScroller = jQuery('<div/>', {class: 'calendar-scroller'});
+		var $calendarData = jQuery ('<div/>', {class: 'calendar-data'});
+		var $laneColumn = jQuery('<div/>', {class: 'lane-column'});
 
-		$this.append($calendarContainer);
-		$calendarContainer.append($calendarScroller);
-		$calendarScroller.append($calendarData);
-		$this.append($laneColumn);
+		// Pre-pend these elements for now since
+		// the lane-column element is hard-coded
+		// in the HTML file for the time being
+		$this.prepend($calendarContainer);
+		$calendarContainer.prepend($calendarScroller);
+		$calendarScroller.prepend($calendarData);
+
+		
+		// ----------------------------------
+		// Step 2: 
+		// Dynamically generate the calendar
+		// grid
+		// ----------------------------------
+		var startHour = settings.timeStart;
+		var endHour = settings.timeEnd;
+		if (endHour <= startHour)
+			console.log("error: end of day is before or equal to start of day.");
+
+		// Assume the calendar grid is broken into 30m
+		// segments, and add a 30m buffer on either side 
+		// of the start and end hours
+		var numberOfCells = ((endHour - startHour) * 2) + 2;
+
+		// Start by rendering in the time row into the
+		// calendar. Make sure localized time differences
+		// can be supported.
+		var $timeLane = jQuery('<div/>', {class: 'time-lane'});
+
+		var i;
+		for (i = startHour; i < endHour; i++)
+		{
+			var $timeCell = jQuery('<div/>', {
+				class:'time-label',
+				text:'7:00am'});
+
+			$timeLane.append($timeCell);
+		}
+		$calendarData.append($timeLane);
+		$calendarData.append(jQuery('<div/>',{class:'time-spacer'}));
+
+
+
+
+		// ----------------------------------
+		// Step 3:
+		// Populate the calendar with events
+		// ----------------------------------
+
+
 
 		// Note :: rkim :: 04-Jun-2013
 		// These load elements will be quickly replaced
 		// by js rendering routines off JSON data. 
+		/*
+		$.get('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.calendar.html',
+			function(data){
+				$calendarData.append(data);
+			}
+		);
 
-		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.lanes.html',
+		$this.append($laneColumn);
+		$.get('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.lanes.html',
 			function(data){
 				$laneColumn.append(data);
 			}
 		);
-		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.events.html',
-			function(data){
-				$calendarData.append(data);
-
-			}
-		);
-		$.get('https://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.calendar.html',
-			function(data){
-				$calendarData.append(data);
-			}
-		);
-	*/
-	
+		*/
 	};
 
 	// Initialize Scheduler 
