@@ -61,21 +61,27 @@ div {
  * and flow of the Scheduler.
  */
 .scheduler {
-  border:1px solid #e6e6e6;
-  position:relative;
   overflow:hidden;
-
   -webkit-user-select:none;
   -moz-user-select:none;
   -ms-user-select:none;
+
+  position:relative;
+  border-spacing:0px;
+  border-right:1px solid #e6e6e6;
+  border-collapse:separate;
+
 }
 .scheduler ::-webkit-scrollbar {
   height:0.0em;
 }
+
+
 .lane-column {
   float:left;
   margin-left:-100%;
 }
+
 .calendar-container {
   float:left;
   width:100%;
@@ -90,66 +96,79 @@ div {
 .calendar-data
 {
   position:relative;
-  border-collapse:collapse;
   z-index:10;
 }
 
 /**
  * Elements within the Scheduler
  */
-.lane-column{
-  border-right:1px solid #cfcfcf;
-}
 .lane {
-  font-weight:bold;
-  color:#666666;
-  border-bottom:1px solid #e6e6e6;
   display:table-row;
+}
+.lane .lane-label {
+  padding-left:10px;
+  vertical-align:middle;
+  font-weight:bold;
+  color:#666666;  
+  display:table-cell;
+
+  border-bottom:1px solid #e6e6e6;
+  border-right:1px solid #cfcfcf;
+  border-left:1px solid #e6e6e6;
 }
 
 /* subgroup */
 .subgroup-lane {
   text-align:center;
   font-weight:bold;
-
   background-color:#f2f2f2;
   position:absolute;
+  z-index:1000;
   display:table;
-  z-index:100;
 }
-.subgroup-spacer
-{
-  display:table-row;
-}
-
-/* time */
-.time-spacer,
-.time-cell {
-  border-bottom:1px solid #c6c6c6;
-}
-.time-cell {
-  text-align:center;
-  font-size: 11px;
+.subgroup-lane .subgroup-label {
+  vertical-align:middle;
   font-weight:bold;
   display:table-cell;
-
-  background:-webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
-  background:-moz-linear-gradient(top, #f2f2f2, #e6e6e6);
-  background:-ms-linear-gradient(top, #f2f2f2, #e6e6e6);
+  border-left:1px solid #e6e6e6;
 }
+.subgroup-lane .first {
+  border-top:1px solid #c6c6c6;
+}
+
+
+/* time */
 .time-lane {
   position:absolute;
   z-index:100;
 }
+.time-lane .time-label {
+  text-align:center;
+  font-size: 11px;
+  font-weight:bold;
+  display:table-cell;
+  background:-webkit-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background:-moz-linear-gradient(top, #f2f2f2, #e6e6e6);
+  background:-ms-linear-gradient(top, #f2f2f2, #e6e6e6);
+
+  border-bottom:1px solid #c6c6c6;
+  border-top:1px solid #c6c6c6;
+}
+.time-lane .border {
+  border-left:1px solid #e6e6e6;
+}
+.time-lane .subgroup {
+  border-top:0px;
+}
 
 /* calendar grid */
 .grid-lane{
-  border-bottom:1px solid #e6e6e6;
   display:table-row;
 }
 .grid-lane .grid {
   display:table-cell;
   border-left:1px solid #e6e6e6;
+  border-bottom:1px solid #e6e6e6;
 }
 .grid-lane .mid {
   border-left:1px dashed #e6e6e6;
@@ -157,13 +176,13 @@ div {
 .grid-lane .start {
   border-left:0px;
 }
+
 /*
 .grid:hover{
   background-color:#daf3ff;
   opacity:0.5;
 }
 */  
-
 
 /* events */
 .event-lane {
@@ -215,11 +234,11 @@ div {
 }
 
 .time-spacer,
-.time-cell {
+.time-lane .time-label {
   height:20px;
 }
 
-.time-lane .time-cell {
+.time-lane .time-label {
   width:100px;
   min-width:100px;
   max-width:100px;
@@ -248,9 +267,8 @@ div {
 /**
  * Set the width of the lane column
  */
-.lane-column,
-.lane-column .lane,
-.lane-column .time-cell,
+.lane-column .lane-label,
+.lane-column .time-label,
 .lane-column .subgroup-spacer {
   width:80px;
   min-width:80px;
@@ -272,14 +290,6 @@ div {
  * ...which is what I'm doing right now with
  * this calendar-lane stuff.
  */
-.valign-mid {
-  vertical-align:middle;
-  display:table-cell;
-}
-.pad10
-{
-  padding-left:10px;
-}
 .last {
   border-right:0px;
 }
@@ -292,7 +302,6 @@ div {
 
 .table {
   display:table;
-  border-collapse:collapse;
 }
 .row {
   display:table-row;

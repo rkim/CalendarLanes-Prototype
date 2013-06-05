@@ -126,24 +126,109 @@
 	
 	<body style="width:100%;">
 	<div id="content">
+		<div style="width:400px;">
+			<p class="title">notes</p>
+			<p class="strong">Completed:
+				<ul>
+					<li>Scrolling momentum and deceleration.</li>
+					<li>Triggers and handlers on day boundaries.</li>
+					<li>Event-Occurrence overlays.</li>
+					<li>Sane CSS heirarchy.</li>
+					<li>Firefox support (Holy crap this sucked).</li>
+					<li>Determine event stacking method: "Pyramid" vs. "Fallen
+						Dominoes."</li>
+					<li>Rework the calendar grid so that the grid lines fall <b>under</b>
+						the hour text instead of bookending them. Maybe add half-hour
+						demarcations as well.</li>
+					<li>Propogate touch scroll events captured in the scrollable
+						scheduler properly out to the rest of the DOM.</li>
+					<li>Fix flickering of schedule on tap inputs on iPad and
+						other touch-enabled devices.</li>
+					<li>Restructured layout to better accomodate dynamic rendering via
+						javascript.</li>
+				</ul>
+			</p>
+			<p class="strong">Not yet implemented:
+				<ul>
+					<li>Package dynamic scheduler functionality into a jQuery plugin.</li>
+					<li>Detect touch-enabled devices and bind click, mousedown, mousemove and
+						mouseup handlers to custom handlers for touchstart, touchmove, and
+						touchend.</li>
+					<li>Hover-over/tap handler to explode overlapping events.</li>
+					<li>Current-time marker</li>
+					<li>Render event counts per lane.</li>
+					<li>Dispatch to event edit page.</li>
+					<li>Make the "scroll-bounce" region on touch devices...prettier.</li>
+					<li>Bit of a stretch, but try to capture and prevent two-finger 
+						swipe navigation in webkit browsers when the event occurs
+						within the calendar.</li>
+
+				</ul>
+			</p>
+			<p class="strong">Cut features:
+				<ul>
+					<li>Continuous scrolling functionality.</li>
+					<li>Drag-reordering of lanes. This gets weird when subgroups are
+						visible.</li>
+					<lI>Tap/click to close and expand lanes.</li>
+					<li>Smart z-index handling - instead of using crazy z-index values
+						to manage everything, manipulate and reorder elements in the DOM.</li>
+				</ul>
+			</p>
+			<p style="padding-left:15px">
+				Two-finger scrolling won't work unless scrollbars are enabled
+				(scrollbars are styled to be hidden in gecko and webkit browsers,
+				but will show in IE).</p>
+			<div style="padding-left:15px;">
+				<input id="xscroll" type="checkbox" name="xscroll" checked>enable scrollbars</input>
+			</div>
+		</div>
+		<div style="height:40px;"></div>
+
+		<!-- 
+		- event occurrence
+		-->
+		<div style="width:400px;">
+			<p class="title">event occurrence</p>
+			<p>An single event occurrence without a home (calendar) to live in.</p>
+
+			<div class="event" style="left:50px; height:90.0px; width:150px;">
+				<div class="event_o service_color_1 type_class">
+					<span class="name_and_time">
+					<span class="full_time">
+					<span class="start_at">1pm</span>
+					<span class="dash">-</span>
+					<span class="end_at">2:30pm</span>
+					</span>
+					<span class="name"><strong>Class A</strong> w/ Staff 1</span>
+					<span class="location">- Seattle</span>
+					</span>
+				</div>
+			</div><!-- event -->
+			<div style="height:90px"></div>
+			<p>It took some work to get these to be well-behaved like this. Its
+				untamed brethren in the current schedule view tend to splay across
+				the entire page and does funny stuff on hover when not constrained by
+				a <strong>#schedule-week-grid -> .grid -> .days -> .day</strong>
+				layout.</p>
+			<p>The hover-over handler is off for now, by the way. I'm working on a 
+				new one better suited for the complexities presented with overlapping
+				event-occurrences.</p>
+		</div>
+		<div style="height:40px"></div>
+
+
 
 
 		<!-- 
-		- base layout - using divs
+		- base layout
 		-->
 		<div style="width:400px;">
 			<p class="title">base layout</p>
-			<p>The proposed default display mode.</p>
-			<p>This may look really dumb for single-propietorship businesses. We
-				may want to default to the week view for those clients.</p>
-			<p class="strike">
-				Also contains a mockup of a continuous scroll calendar (probably
-				implemented as a circular array of time columns).</p>
 		</div>
 
-
 		<div class="viewport">
-			<div style="height:120px"></div>
+			<div style="height:100px"></div>
 			<div class="divider"></div>
 
 			<div id="basic" class="scheduler">
@@ -152,141 +237,150 @@
 						<div class="calendar-data">
 
 							<div class="time-lane">
-								<div class="time-cell">7:00am</div><div class="time-cell">8:00am</div>
-								<div class="time-cell">9:00am</div><div class="time-cell">10:00am</div><div class="time-cell">11:00am</div>
-								<div class="time-cell">12:00pm</div><div class="time-cell">1:00pm</div><div class="time-cell">2:00pm</div>
-								<div class="time-cell">3:00pm</div><div class="time-cell">4:00pm</div><div class="time-cell">5:00pm</div>
-								<div class="time-cell">6:00pm</div><div class="time-cell">7:00pm</div><div class="time-cell">8:00pm</div>
+								<div class="time-label">7:00am</div><div class="time-label">8:00am</div>
+								<div class="time-label">9:00am</div><div class="time-label">10:00am</div><div class="time-label">11:00am</div>
+								<div class="time-label">12:00pm</div><div class="time-label">1:00pm</div><div class="time-label">2:00pm</div>
+								<div class="time-label">3:00pm</div><div class="time-label">4:00pm</div><div class="time-label">5:00pm</div>
+								<div class="time-label">6:00pm</div><div class="time-label">7:00pm</div><div class="time-label">8:00pm</div>
 							</div>
 							<div class="time-spacer"></div>
 
-
-
-
 							<!--
-               - Lane :: Staff 1 
-               -->
-              <div class="event-lane">
-              	<!-- 1pm - 2pm :: Seattle :: Class B :: Staff 1  -->
-	              <div class="event" style="left:650px; height:33px; width:90px;">
-	                <div class="event_o service_color_2 type_class">
-	                  <span class="name_and_time">
-	                    <span class="full_time">
-	                      <span class="start_at">1pm</span>
-	                      <span class="dash">-</span>
-	                      <span class="end_at">2pm</span>
-	                    </span>
-	                    <span class=""><strong>Class B</strong> w/ Staff 1</span>
-	                    <span class="location">- Seattle</span>
-	                  </span>
-	                </div>
-	              </div>
-	              <!-- 1pm - 2:30pm  :: Seattle :: Class A :: Staff 1 -->
-	              <div class="event" style="left:650px; top:33px; height:33px; width:150px;">
-	                <div class="event_o service_color_1 type_class">
-	                  <span class="name_and_time">
-	                    <span class="full_time">
-	                      <span class="start_at">1pm</span>
-	                      <span class="dash">-</span>
-	                      <span class="end_at">2:30pm</span>
-	                    </span>
-	                    <span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
-	                    <span class="location">- Seattle</span>
-	                  </span>
-	                </div>  
-	              </div>
-	            </div>
-							<div class="grid-lane"><!-- table-row -->
-								<div class="grid start"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-							</div>
-
-
-
-							<!--
-               - Lane :: Staff 2
-               -->
+							- Lane :: Staff 1 
+							-->
 							<div class="event-lane">
-	              <!-- 10am - 12pm :: Seattle :: Class C :: Staff 2  -->
-								<div class="event" style="left:350px; height:65px; width:200px;">
-							    <div class="event_o service_color_3 type_class">
-							      <span class="name_and_time">
-							        <span class="full_time">
-							          <span class="start_at">10am</span>
-							          <span class="dash">-</span>
-							          <span class="end_at">12pm</span>
-							        </span>
-							        <span class=""><strong>Class C</strong> w/ Staff 2</span>
-							        <span class="location">- Seattle</span>
-							      </span>
-							    </div>
-							  </div>
-	              <!-- 3pm - 5pm :: Seattle :: Class C :: Staff 2  -->
-							  <div class="event" style="left:850px; height:65px; width:200px;">
-							    <div class="event_o service_color_3 type_class">
-							      <span class="name_and_time">
-							        <span class="full_time">
-							          <span class="start_at">3pm</span>
-							          <span class="dash">-</span>
-							          <span class="end_at">5pm</span>
-							        </span>
-							        <span class=""><strong>Class C</strong> w/ Staff 2</span>
-							        <span class="location">- Seattle</span>
-							      </span>
-							    </div>
-							  </div>
-							</div>
-							<div class="grid-lane"><!-- table-row -->
-								<div class="grid start"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
-								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
-							</div>
-
-							<!--
-               - Lane :: Staff 3
-               -->
-							<div class="event-lane">
-								<!-- 9:30am - 10:30am :: Seattle :: Class B :: Staff 3 -->
-								<div class="event" style="left:300px; height:65px; width:100px;">
+								<!-- 1pm - 2pm :: Seattle :: Class B :: Staff 1  -->
+								<div class="event" style="left:650px; height:33px; width:90px;">
 									<div class="event_o service_color_2 type_class">
-									  <span class="name_and_time">
-									    <span class="full_time">
-									      <span class="start_at">9:30am</span>
-									      <span class="dash">-</span>
-									      <span class="end_at">10:30am</span>
-									    </span>
-									    <span class=""><strong>Class B</strong> w/ Staff 3</span>
-									    <span class="location">- Seattle</span>
-									  </span>
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 1</span>
+										<span class="location">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 1pm - 2:30pm  :: Seattle :: Class A :: Staff 1 -->
+								<div class="event" style="left:650px; top:33px; height:33px; width:150px;">
+									<div class="event_o service_color_1 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2:30pm</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
+										<span class="location">- Seattle</span>
+										</span>
+									</div>  
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+
+							<!--
+							- Lane :: Staff 2
+							-->
+							<div class="event-lane">
+								<!-- 10am - 12pm :: Seattle :: Class C :: Staff 2  -->
+								<div class="event" style="left:350px; height:65px; width:200px;">
+									<div class="event_o service_color_3 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">10am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 2</span>
+										<span class="location">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 3pm - 5pm :: Seattle :: Class C :: Staff 2  -->
+								<div class="event" style="left:850px; height:65px; width:200px;">
+									<div class="event_o service_color_3 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">3pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">5pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 2</span>
+										<span class="location">- Seattle</span>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+
+							<!--
+							- Lane :: Staff 3
+							-->
+							<div class="event-lane">
+								 <!-- 9:30am - 10:30am :: Seattle :: Class B :: Staff 3 -->
+								 <div class="event" style="left:300px; height:65px; width:100px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">9:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">10:30am</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location">- Seattle</span>
+										</span>
 									</div>
 								</div>
 								<!-- 1pm - 2:30pm :: Seattle :: Class A :: Staff 3 -->
 								<div class="event" style="left:650px; height:65px; width:150px;">
 									<div class="event_o service_color_1 type_class">
-									  <span class="name_and_time">
-									    <span class="full_time">
-									      <span class="start_at">1pm</span>
-									      <span class="dash">-</span>
-									      <span class="end_at">2:30pm</span>
-									    </span>
-									    <span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
-									    <span class="location">- Seattle</span>
-									  </span>
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2:30pm</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
+										<span class="location">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 2:30pm - 3:30pm :: Seattle :: Class B :: Staff 3 -->
+								 <div class="event" style="left:800px; top:150px; height:65px; width:100px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">2:30pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">3:30pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location">- Seattle</span>
+										</span>
 									</div>
 								</div>
 							</div>
@@ -304,37 +398,40 @@
 							</div>
 
 							<!--
-               - Lane :: Staff 4
-               -->
+							- Lane :: Staff 4
+							-->
 							<div class="event-lane">
+								<!--
+								- Lane :: Staff 4
+								-->
 								<!-- 10am - 12pm :: Los Angeles :: Class D :: Staff 4 -->
-	              <div class="event" style="left:350px; height:60px; width:200px;">
-	                <div class="event_o service_color_4 type_class">
-	                  <span class="name_and_time">
-	                    <span class="full_time">
-	                      <span class="start_at">10am</span>
-	                      <span class="dash">-</span>
-	                      <span class="end_at">12pm</span>
-	                    </span>
-	                    <span class=""><strong>Class D</strong> w/ Staff 4</span>
-	                    <span class="location">- Los Angeles</span>
-	                  </span>
-	                </div>
-	              </div>
-	              <!-- 11:30am - 12:30pm :: Los Angeles :: Class B :: Staff 4 -->
-	              <div class="event" style="left:500px; top:5px; height:60px; width:100px;">
-	                <div class="event_o service_color_2 type_class stacked">
-	                  <span class="name_and_time">
-	                    <span class="full_time">
-	                      <span class="start_at">11:30am</span>
-	                      <span class="dash">-</span>
-	                      <span class="end_at">12:30pm</span>
-	                    </span>
-	                    <span class=""><strong>Class B</strong> w/ Staff 4</span>
-	                    <span class="location">- Los Angeles</span>
-	                  </span>
-	                </div>
-	              </div>
+								<div class="event" style="left:350px; height:60px; width:200px;">
+									<div class="event_o service_color_4 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">10am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class D</strong> w/ Staff 4</span>
+										<span class="location">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+								<!-- 11:30am - 12:30pm :: Los Angeles :: Class B :: Staff 4 -->
+								<div class="event" style="left:500px; top:5px; height:60px; width:100px;">
+									<div class="event_o service_color_2 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12:30pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 4</span>
+										<span class="location">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
 							</div>
 							<div class="grid-lane"><!-- table-row -->
 								<div class="grid start"></div>
@@ -353,34 +450,573 @@
 					</div><!-- calendar-scroller -->
 				</div><!-- calendar-container -->
 
-
 				<!-- lane-column -->
 				<div class="lane-column">
-					<div class="table">
-						<div class="time-cell"></div>
-						<div></div><!-- spacer -->
-						<div class="lane"><div class="valign-mid pad10">Staff 1</div></div>
-						<div></div><!-- spacer -->
-						<div class="lane"><div class="valign-mid pad10">Staff 2</div></div>
-						<div></div><!-- spacer -->
-						<div class="lane"><div class="valign-mid pad10">Staff 3</div></div>
-						<div></div><!-- spacer -->
-						<div class="lane"><div class="valign-mid pad10">Staff 4</div></div>
-					</div>
+					<div class="time-lane"><div class="time-label border"></div></div>
+					<div class="time-spacer"></div>
+
+					<div class="lane"><div class="lane-label">Staff 1</div></div>
+					<div class="lane"><div class="lane-label">Staff 2</div></div>
+					<div class="lane"><div class="lane-label">Staff 3</div></div>
+					<div class="lane"><div class="lane-label">Staff 4</div></div>
 				</div><!-- lane column -->
-
-
 			</div><!-- scheduler -->
 		</div><!-- viewport -->
 		<div style="height:40px;"></div>
-		
 
 
-		
+		<!--
+		- subgroups
+		-->
+		<div style="width:400px;">
+			<p class="title">subgroups</p>
+		</div>
+		<div class="viewport">
+			<div style="height:100px"></div>
+			<div class="divider"></div>
+			<div class="scheduler">
+
+
+				<div class="calendar-container">
+					<div class="calendar-scroller">
+						<div class="calendar-data subgroup"><!-- table -->
+							<div class="subgroup-spacer"></div>
+							<div class="time-lane">
+								<div class="time-label subgroup start">6:00am</div><div class="time-label subgroup">7:00am</div><div class="time-label subgroup">8:00am</div>
+								<div class="time-label subgroup">9:00am</div><div class="time-label subgroup">10:00am</div><div class="time-label subgroup">11:00am</div>
+								<div class="time-label subgroup">12:00pm</div><div class="time-label subgroup">1:00pm</div><div class="time-label subgroup">2:00pm</div>
+								<div class="time-label subgroup">3:00pm</div><div class="time-label subgroup">4:00pm</div><div class="time-label subgroup">5:00pm</div>
+								<div class="time-label subgroup">6:00pm</div><div class="time-label subgroup">7:00pm</div><div class="time-label subgroup">8:00pm</div>
+							</div>
+							<div class="time-spacer"></div>
+
+							<!--
+							 - Lane :: Class A - Los Angeles
+							 -->
+							<div class="event-lane">
+								<!-- 10am - 11:30pm  :: Los Angeles :: Class A :: Staff 1 & Staff 3 -->
+								<div class="event" style="left:450px; height:65px; width:150px;">
+									<div class="event_o service_color_1 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">10am</span>
+										<span class="dash">-</span>
+										<span class="end_at">11:30am</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>	
+								</div>
+								
+								<!-- 1pm - 2:30pm  :: Los Angeles :: Class A :: Staff 1 & Staff 3 -->
+								<div class="event" style="left:750px; height:65px; width:150px;">
+									<div class="event_o service_color_1 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2:30pm</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 2:30pm - 4pm  :: Los Angeles :: Class A :: Staff 1 & Staff 3 -->
+								<div class="event" style="left:900px; height:65px; width:150px;">
+									<div class="event_o service_color_1 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">2:30pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">4pm</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 4pm - 5:30pm  :: Los Angeles :: Class A :: Staff 1 & Staff 3 -->
+								<div class="event" style="left:1050px; height:65px; width:150px;">
+									<div class="event_o service_color_1 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">4pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">5:30pm</span>
+										</span>
+										<span class=""><strong>Class A</strong> w/ Staff 1 & Staff 3</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>	
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+
+							<!--
+							 - Lane :: Class B - Los Angeles
+							 -->
+							<div class="event-lane">
+								<!-- 8am - 8:30am  :: Los Angeles :: Class B :: Staff 6 -->
+								<div class="event" style="left:250px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">8am</span>
+										<span class="dash">-</span>
+										<span class="end_at">8:30am</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 6</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+								<!-- 8:30am - 9am  :: Los Angeles :: Class B :: Staff 6 -->
+								<div class="event" style="left:300px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">8:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">9am</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 6</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+								<!-- 11am - 11:30am  :: Los Angeles :: Class B :: Staff 3-->
+								<div class="event" style="left:550px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11am</span>
+										<span class="dash">-</span>
+										<span class="end_at">11:30am</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+								<!-- 11:30am - 12pm  :: Los Angeles :: Class B :: Staff 3 -->
+								<div class="event" style="left:600px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+								<!-- 3:30pm - 4pm  :: Los Angeles :: Class B :: Staff 2 -->
+								<div class="event" style="left:1000px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">3:30pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">4pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 2</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+								<!-- 4pm - 4:30pm  :: Los Angeles :: Class B :: Staff 2 -->
+								<div class="event" style="left:1050px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">4pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">4:30pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 2</span>
+										<span class="location hide">- Los Angeles</span>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+
+							<div class="subgroup-spacer"></div>
+							<div class="time-lane">
+								<div class="time-label subgroup start">6:00am</div><div class="time-label subgroup">7:00am</div><div class="time-label subgroup">8:00am</div>
+								<div class="time-label subgroup">9:00am</div><div class="time-label subgroup">10:00am</div><div class="time-label subgroup">11:00am</div>
+								<div class="time-label subgroup">12:00pm</div><div class="time-label subgroup">1:00pm</div><div class="time-label subgroup">2:00pm</div>
+								<div class="time-label subgroup">3:00pm</div><div class="time-label subgroup">4:00pm</div><div class="time-label subgroup">5:00pm</div>
+								<div class="time-label subgroup">6:00pm</div><div class="time-label subgroup">7:00pm</div><div class="time-label subgroup">8:00pm</div>
+							</div>
+							<div class="time-spacer"></div>
+
+
+							<!--
+							 - Lane :: Class B - Seattle
+							 -->
+							<div class="event-lane">
+								<!-- 9:30am - 10am  :: Seattle :: Class B :: Staff 3-->
+								<div class="event" style="left:400px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">9:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">10am</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 10am - 10:30am  :: Seattle :: Class B :: Staff 3 -->
+								<div class="event" style="left:450px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">10am</span>
+										<span class="dash">-</span>
+										<span class="end_at">10:30am</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+
+								<!-- 1:30pm - 2pm  :: Seattle :: Class B :: Staff 3 -->
+								<div class="event" style="left:800px; height:55px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1:30pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 1:45pm - 2:15pm  :: Seattle :: Class B :: Staff 1-->
+								<div class="event" style="left:825px; top:5px; height:55px; width:50px;">
+									<div class="event_o service_color_2 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1:45pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2:15pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 1</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 2pm - 2:30pm  :: Seattle :: Class B :: Staff 3-->
+								<div class="event" style="left:850px; top:10px; height:55px; width:50px;">
+									<div class="event_o service_color_2 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">2pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">2:30pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								
+								<!-- 5:30pm - 6pm  :: Seattle :: Class B :: Staff 3 -->
+								<div class="event" style="left:1200px; height:65px; width:50px;">
+									<div class="event_o service_color_2 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">5:30pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">6pm</span>
+										</span>
+										<span class=""><strong>Class B</strong> w/ Staff 3</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+
+							<!--
+							 - Lane :: Class C - Seattle
+							 -->
+							<div class="event-lane">
+								<!-- 10am - 11am  :: Seattle :: Class C :: Staff 6 -->
+								<div class="event" style="left:450px; height:45px; width:100px;">
+									<div class="event_o service_color_3 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">10am</span>
+										<span class="dash">-</span>
+										<span class="end_at">11am</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 6</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>
+								</div>
+								<!-- 10:30am - 11:30am  :: Seattle :: Class C :: Staff 7 -->
+								<div class="event" style="left:500px; top:5px; height:45px; width:100px;">
+									<div class="event_o service_color_3 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">10:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">11:30am</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 7</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 11am - 12pm  :: Seattle :: Class C :: Staff 6 -->
+								<div class="event" style="left:550px; top:32px; height:22px; width:100px;">
+									<div class="event_o service_color_3 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 6</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 11am - 12pm  :: Seattle :: Class C :: Staff 4 -->
+								<div class="event" style="left:550px; top:10px; height:22px; width:100px;">
+									<div class="event_o service_color_3 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 4</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 11:30am - 12:30pm  :: Seattle :: Class C :: Staff 7 -->
+								<div class="event" style="left:600px; top:15px; height:45px; width:100px;">
+									<div class="event_o service_color_3 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11:30am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12:30pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 7</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 12pm - 1pm  :: Seattle :: Class C :: Staff 6 -->
+								<div class="event" style="left:650px; top:20px; height:45px; width:100px;">
+									<div class="event_o service_color_3 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">12pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">1pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 6</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+
+								<!-- 3pm - 4pm  :: Seattle :: Class C :: Staff 6 -->
+								<div class="event" style="left:950px; height:65px; width:100px;">
+									<div class="event_o service_color_3 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">3pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">4pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 6</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 4pm - 5pm  :: Seattle :: Class C :: Staff 6 -->
+								<div class="event" style="left:1050px; height:65px; width:100px;">
+									<div class="event_o service_color_3 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">4pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">5pm</span>
+										</span>
+										<span class=""><strong>Class C</strong> w/ Staff 6</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+
+							<!--
+							 - Lane :: Class D - Seattle
+							 -->
+							<div class="event-lane">
+								<!-- 9am - 12pm  :: Seattle :: Class D :: Staff 2 -->
+								<div class="event" style="left:350px; height:27px; width:300px;">
+									<div class="event_o service_color_4 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">9am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class D</strong> w/ Staff 2</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 9am - 12pm  :: Seattle :: Class D :: Staff 1 -->
+								<div class="event" style="left:350px; top:27px; height:27px; width:300px;">
+									<div class="event_o service_color_4 type_class">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">9am</span>
+										<span class="dash">-</span>
+										<span class="end_at">12pm</span>
+										</span>
+										<span class=""><strong>Class D</strong> w/ Staff 1</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 11am - 1pm  :: Seattle :: Class D :: Staff 2 -->
+								<div class="event" style="left:550px; top:5px; height:55px; width:300px;">
+									<div class="event_o service_color_4 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">11am</span>
+										<span class="dash">-</span>
+										<span class="end_at">1pm</span>
+										</span>
+										<span class=""><strong>Class D</strong> w/ Staff 2</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+								<!-- 1pm - 4pm  :: Seattle :: Class D :: Staff 2 -->
+								<div class="event" style="left:750px; top:10px; height:55px; width:300px;">
+									<div class="event_o service_color_4 type_class stacked">
+										<span class="name_and_time">
+										<span class="full_time">
+										<span class="start_at">1pm</span>
+										<span class="dash">-</span>
+										<span class="end_at">4pm</span>
+										</span>
+										<span class=""><strong>Class D</strong> w/ Staff 2</span>
+										<span class="location hide">- Seattle</span>
+										</span>
+									</div>	
+								</div>
+							</div>
+							<div class="grid-lane"><!-- table-row -->
+								<div class="grid start"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+								<div class="grid mid"></div><div class="grid"></div><div class="grid mid"></div>
+								<div class="grid"></div><div class="grid mid"></div><div class="grid"></div>
+							</div>
+						</div><!-- calendar-data -->
+					</div><!-- calender-scroller -->
+				</div><!-- calendar-container -->
+				
+
+				<!-- lane-column -->
+				<div class="lane-column">
+					<div class="subgroup-lane"><div class="subgroup-label first">Los Angeles</div></div>
+					<div class="subgroup-spacer"></div>
+					<div class="time-lane"><div class="time-label border subgroup"></div></div>
+					<div class="time-spacer"></div>
+
+					<div class="lane"><div class="lane-label">Class A</div></div>
+					<div class="lane"><div class="lane-label">Class B</div></div>
+
+			 		<div class="subgroup-lane"><div class="subgroup-label">Seattle</div></div>
+					<div class="subgroup-spacer"></div>
+					<div class="time-lane"><div class="time-label border subgroup"></div></div>
+					<div class="time-spacer"></div>
+
+					<div class="lane"><div class="lane-label">Class B</div></div>
+					<div class="lane"><div class="lane-label">Class C</div></div>
+					<div class="lane"><div class="lane-label">Class D</div></div>
+				</div><!-- lane column -->
+			</div><!-- scheduler -->
 		</div><!-- viewport -->
+
+
+
+
 		<div style="height:80px;"></div>
-
-
 	</div>
 	</body>
 </html>
