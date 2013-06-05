@@ -43,6 +43,12 @@
 		if (elementId === "subgroups")
 			return;
 
+		// TODO :: rkim :: 04-Jun-2013
+		// Define all the styles used in the rendering
+		// of the calendar here.
+		var cssClasses = {
+
+		};
 		
 		// ----------------------------------
 		// Step 1: 
@@ -71,22 +77,16 @@
 		if (endHour <= startHour)
 			console.log("error: end of day is before or equal to start of day.");
 
-		// Assume the calendar grid is broken into 30m
-		// segments, and add a 30m buffer on either side 
-		// of the start and end hours
-		var numberOfCells = ((endHour - startHour) * 2) + 2;
-
 		// Start by rendering in the time row into the
-		// calendar. Make sure localized time differences
+		// calendar. Make sure localized time strings
 		// can be supported.
 		var $timeLane = jQuery('<div/>', {class: 'time-lane'});
 
-		var i;
-		for (i = startHour; i < endHour; i++)
-		{
+		var currentHour = startHour;
+		while(currentHour++ < endHour) {
 			var $timeCell = jQuery('<div/>', {
 				class:'time-label',
-				text:'7:00am'});
+				text: currentHour + ':00'});
 
 			$timeLane.append($timeCell);
 		}
@@ -94,12 +94,48 @@
 		$calendarData.append(jQuery('<div/>',{class:'time-spacer'}));
 
 
+		// Assume the calendar grid is broken into 30m
+		// segments.
+		var numberOfCells = (endHour - startHour) * 2;
 
+		
+		// TODO :: rkim :: 04-Jun-2013
+		// ... for each subgroup
+		var numberOfLanes = 4; // hard-coded for now
+		var laneIndex = 0;
+		var calendarLanes = new Array();
+		while (laneIndex++ < numberOfLanes)
+		{
+			var calendarLane = jQuery('<div/>', {
+				id:'basic-calendar-lane-'+laneIndex,
+				class:'calendar-lane'});
+			calendarLanes.push(calendarLane);
+		}
+
+		calendarLanes.map(function(calLane) {
+			var gridLane = jQuery('<div/>', {class:'grid-lane'});
+			
+			var gridIndex = 0;
+			var classString = 'grid start';
+			while (gridIndex++ < numberOfCells) {
+				gridLane.append(jQuery('<div/>', {class:classString}));
+
+				classString = 'grid';
+				if (gridIndex % 2 === 0)
+					classString += ' mid';
+			}
+			calLane.append(gridLane);
+		});
+		$calendarData.append(calendarLanes);
 
 		// ----------------------------------
 		// Step 3:
 		// Populate the calendar with events
 		// ----------------------------------
+		
+
+
+
 
 
 
