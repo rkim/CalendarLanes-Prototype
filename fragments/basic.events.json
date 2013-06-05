@@ -1,0 +1,183 @@
+{
+	"dayRangeStart":"05-Jun-2013 6:00 PDT",
+	"dayRangeEnd":"05-Jun-2013 20:00 PDT",
+
+	"subgroupDepth":1,
+	"subgroups":
+	[
+		{
+			"id":1,
+			"type":"location",
+
+			"depth":0,
+			"displayHeader":false,
+			"headerLabel":null,
+
+			"lanes":
+			[
+				{
+					"id":"11",
+					"type":"staff",
+					"name":"Staff 1",
+
+					"events":
+					[
+						{
+							"id":111,
+							"type":"class",
+
+							"name":"Class B",
+							"location":"Seattle",
+							"staff":[
+								{"id":1001, "name":"Staff 1"},
+								{"id":1003, "name":"Staff 3"}
+							],
+
+							"startTime":"05-Jun-2013 13:00 PDT",
+							"endTime":"05-Jun-2013 14:00 PDT",
+							"serviceColor":2
+						},
+						{
+							"id":112,
+							"type":"class",
+
+							"name":"Class A",
+							"location":"Seattle",
+							"staff":[
+								{"id":1001, "name":"Staff 1"}
+							],
+							"startTime":"05-Jun-2013 13:00 PDT",
+							"endTime":"05-Jun-2013 14:30 PDT",
+							"serviceColor":1
+						}
+					]
+				},
+
+				{
+					"id":"21",
+					"type":"staff",
+					"name":"Staff 2",
+
+					"events":
+					[
+						{
+							"id":121,
+							"type":"class",
+
+							"name":"Class C",
+							"location":"Seattle",
+							"staff":[
+								{"id":1002, "name":"Staff 2"}
+							],
+							"startTime":"05-Jun-2013 10:00 PDT",
+							"endTime":"05-Jun-2013 12:00 PDT",
+							"serviceColor":3
+						},
+						{
+							"id":122,
+							"type":"class",
+
+							"name":"Class A",
+							"location":"Seattle",
+							"staff":[
+								{"id":1002, "name":"Staff 2"}
+							],
+							"startTime":"05-Jun-2013 15:00 PDT",
+							"endTime":"05-Jun-2013 17:00 PDT",
+							"serviceColor":3
+						}
+					]
+				},
+
+				{
+					"id":"31",
+					"type":"staff",
+					"name":"Staff 3",
+
+					"events":
+					[
+						{
+							"id":131,
+							"type":"class",
+
+							"name":"Class B",
+							"location":"Seattle",
+							"staff":[
+								{"id":1003, "name":"Staff 3"}
+							],
+							"startTime":"05-Jun-2013 9:30 PDT",
+							"endTime":"05-Jun-2013 10:30 PDT",
+							"serviceColor":2
+						},
+						{
+							"id":132,
+							"type":"class",
+
+							"name":"Class A",
+							"location":"Seattle",
+							"staff":[
+								{"id":1001, "name":"Staff 1"},
+								{"id":1003, "name":"Staff 3"}
+							],
+							"startTime":"05-Jun-2013 13:00 PDT",
+							"endTime":"05-Jun-2013 14:30 PDT",
+							"serviceColor":1
+						},
+						{
+							"id":133,
+							"type":"class",
+
+							"name":"Class B",
+							"location":"Seattle",
+							"staff":[
+								{"id":1003, "name":"Staff 3"}
+							],
+							"startTime":"05-Jun-2013 14:30 PDT",
+							"endTime":"05-Jun-2013 15:30 PDT",
+							"serviceColor":2
+						}
+					]
+				},
+
+				{
+					"id":"41",
+					"type":"staff",
+					"name":"Staff 4",
+
+					"events":
+					[
+						{
+							"id":141,
+							"type":"class",
+
+							"name":"Class D",
+							"location":"Los Angeles",
+							"staff":[
+								{"id":1004, "name":"Staff 4"}
+							],
+							"startTime":"05-Jun-2013 10:00 PDT",
+							"endTime":"05-Jun-2013 12:00 PDT",
+							"serviceColor":4
+						},
+						{
+							"id":142,
+							"type":"class",
+
+							"name":"Class B",
+							"location":"Los Angeles",
+							"staff":[
+								{"id":1004, "name":"Staff 4"}
+							],
+							"startTime":"05-Jun-2013 11:30 PDT",
+							"endTime":"05-Jun-2013 12:30 PDT",
+							"serviceColor":2
+						}
+					]
+				}
+
+
+			]
+		}
+	]
+}
+

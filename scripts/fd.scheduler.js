@@ -20,6 +20,29 @@
  * time constraints demand I bake-in dependencies on
  * certain CSS classes and so forth. Oh well.
  *
+ *
+ *
+ *	scheduler
+ *		calendar-container
+ *			calendar-scroller
+ *				calendar-data
+ *					subgroup
+ *						time-lane
+ *						calendar-lane
+ *							event-lane
+ *								event
+ *								...
+ *							grid-lane
+ *								grid
+ *								...
+ *						...
+ *					...
+ *		lane-column
+ *			subgroup
+ *				time-lane
+ *				lane
+ *			...
+ *
  */
 	var DEFAULTS = {
 		horizLayout: true,
@@ -27,12 +50,27 @@
 		drawEvents: false,
 		hardwareAcceleration: true,
 
+		minHeight:"100%",
+		maxHeight:"100%",
+		maxWidth:"100%",
+		minWidth:"100%",
+
 		timeStart: 6,
 		timeEnd: 20,
 	};
 	var SETTINGS = "fdScheduler-Settings";
 
 	// Bind event handlers for event occurrences
+
+
+	// Render the event data
+	var renderEventOccurrences = function(calendarLanes, data, settings)
+	{
+		console.log(calendarLanes);
+		console.log(data);
+		console.log(settings);
+
+	}
 
 
 	// Render the grid
@@ -132,11 +170,21 @@
 		// Step 3:
 		// Populate the calendar with events
 		// ----------------------------------
-		
+		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.events.json')
+		.done(function(data) {
+			// Parse and massage the data
 
 
+			// Render event data
+			renderEventOccurrences (calendarLanes, data, settings);
 
+			// Bind hover over handler
 
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			console.log(textStatus);
+			console.log(errorThrown);
+		});
 
 
 		// Note :: rkim :: 04-Jun-2013
