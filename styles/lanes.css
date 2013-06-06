@@ -137,6 +137,11 @@ div {
 }
 
 
+.lane-group {
+
+}
+
+
 /* time */
 .time-lane {
   position:absolute;
@@ -239,9 +244,9 @@ div {
 }
 
 .time-lane .time-label {
-  width:100px;
-  min-width:100px;
-  max-width:100px;
+  width:120px;
+  min-width:120px;
+  max-width:120px;
 }
 
 .subgroup-spacer,
@@ -257,9 +262,9 @@ div {
 }
 
 .grid {
-  width:50px;
-  min-width:50px;
-  max-width:50px;
+  width:60px;
+  min-width:60px;
+  max-width:60px;
   z-index:-1000;
 
 }

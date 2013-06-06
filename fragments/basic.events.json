@@ -1,7 +1,4 @@
 {
-	"dayRangeStart":"05-Jun-2013 6:00 PDT",
-	"dayRangeEnd":"05-Jun-2013 20:00 PDT",
-
 	"subgroupDepth":1,
 	"subgroups":
 	[
@@ -180,4 +177,3 @@
 		}
 	]
 }
-

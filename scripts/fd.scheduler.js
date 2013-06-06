@@ -63,8 +63,6 @@
 	// Bind event handlers for event occurrences
 
 
-
-
 	// TODO :: rkim :: 04-Jun-2013
 	// Define all the styles used in the rendering
 	// of the calendar here.
@@ -72,50 +70,72 @@
 
 	};
 
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	var renderEventOccurrences = function(eventLane, eventOccurrences, settings) {
+		console.log(eventOccurrences);
 
-	// Render the event data
-	var renderEventOccurrences = function(eventLanes, eventData, settings) {
-		console.log(eventData);
-		console.log(settings);
+		// First, sort and build the event-
+		// occurrence tree
 
-		//
-		//eventData.subgroups
+		// Now query the calendar to determine
+		// lane widths...or should that be from
+		// settings?
 
-
+		// Set the horizontal offsets for each
+		// of the events.
 	};
 
-	var renderScheduleLanes = function(scheduler, eventData, settings) {
-
-	};
-
-	var renderCalendarGrid = function(calendarData, eventData, settings) {
-		// Should I derive this from the event-occurrence data?
-		// Probably not. Business configuration information is
-		// best left out of the event data imo.
-		//
-		// What do we do if a one-off event is scheduled after
-		// standard business hours?
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	var renderGridLines = function (gridLane, settings)
+	{
 		var startHour = settings.timeStart;
 		var endHour = settings.timeEnd;
 
+		// Assume the calendar grid is broken into 30m
+		// segments.
+		var numberOfCells = (endHour - startHour) * 2;
 
-		// The subgroup loop...
-		//
-		// For now, assume we'll won't see nested subloops. They're
-		// totally possible given the data structure, but I've no
-		// pressing desire or need to over-complicate the code here
-		// for a possibility.
-		var subgroupIndex = 0;
-		var numSubGroups = eventData.subgroups.length;
-		for (subgroupIndex = 0; subgroupIndex < numSubGroups; subgroupIndex++) {
+		var gridIndex = 0;
+		var classString = 'grid start';
+		while (gridIndex++ < numberOfCells) {
+			gridLane.append(jQuery('<div/>', {class:classString}));
 
+			classString = 'grid';
+			if (gridIndex % 2 === 0)
+				classString += ' mid';
 		}
+	};
+
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	var renderSingleCalendarLane = function(laneGroup, groupData, settings) {
+		// ----------------------------------
+		// What do we do if a one-off event is
+		// scheduled after business hours?
+		var startHour = settings.timeStart;
+		var endHour = settings.timeEnd;
 
 		// Start by rendering in the time row into the
 		// calendar. Make sure localized time strings
 		// can be supported.
-		var timeLane = jQuery('<div/>', {class: 'time-lane'});
-
+		var timeLane = jQuery('<div/>', {class:'time-lane'});
 		var currentHour = startHour;
 		while(currentHour++ < endHour) {
 			var timeCell = jQuery('<div/>', {
@@ -124,47 +144,83 @@
 
 			timeLane.append(timeCell);
 		}
-		calendarData.append(timeLane);
-		calendarData.append(jQuery('<div/>',{class:'time-spacer'}));
+		laneGroup.append(timeLane);
+		laneGroup.append(jQuery('<div/>', {class:'time-spacer'}));
 
 
-		// Assume the calendar grid is broken into 30m
-		// segments.
-		var numberOfCells = (endHour - startHour) * 2;
-
-		
-		// TODO :: rkim :: 04-Jun-2013
-		// ... for each subgroup
-		var numberOfLanes = 4; // hard-coded for now
 		var laneIndex = 0;
-		var calendarLanes = new Array();
-		while (laneIndex++ < numberOfLanes)
+		var numberOfLanes = groupData.lanes.length;
+		for (laneIndex = 0; laneIndex < numberOfLanes; laneIndex++)
 		{
 			var calendarLane = jQuery('<div/>', {
 				id:'basic-calendar-lane-'+laneIndex,
 				class:'calendar-lane'});
-			calendarLanes.push(calendarLane);
-		}
 
-		calendarLanes.map(function(calLane) {
-			var gridLane = jQuery('<div/>', {class:'grid-lane'});
-			
-			var gridIndex = 0;
-			var classString = 'grid start';
-			while (gridIndex++ < numberOfCells) {
-				gridLane.append(jQuery('<div/>', {class:classString}));
-
-				classString = 'grid';
-				if (gridIndex % 2 === 0)
-					classString += ' mid';
+			// Create and add event lane
+			var eventLane = jQuery('<div/>', {class:'event-lane'});
+			var eventOccurrences = groupData.lanes[laneIndex].events;
+			if (eventOccurrences.length > 0) {
+				renderEventOccurrences(eventLane, eventOccurrences, settings);
 			}
-			calLane.append(gridLane);
-		});
-		calendarData.append(calendarLanes);
+			calendarLane.append(eventLane);
+
+			// Create and add grid lane
+			var gridLane = jQuery('<div/>', {class:'grid-lane'});
+			renderGridLines(gridLane, settings);
+			calendarLane.append(gridLane);
+
+
+			laneGroup.append(calendarLane);
+		}
 	};
 
 
-	// Render the grid
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	var renderCalendarLanes = function(calendarData, eventData, settings) {
+		// The lane-group loop...
+		//
+		// For now, assume we'll won't see
+		// nested subloops. They're possible
+		//  given the data structure, but I've
+		// no pressing desire or need to over-
+		// complicate the code here for a
+		// possibility.
+		var groupIndex = 0;
+		var numLaneGroups = eventData.subgroups.length;
+		for (groupIndex = 0; groupIndex < numLaneGroups; groupIndex++) {
+			
+			var groupData = eventData.subgroups[groupIndex];
+			var laneGroup = jQuery('<div/>', {
+				class:'lane-group',
+				id:'subroup-' + groupIndex,
+			});
+
+			// Add a spacer if the subgroup is to
+			// be displayed
+			if (groupData.displayHeader) {
+				laneGroup.append(jQuery('<div/>', {class:'subgroup-spacer'}));
+			}
+
+			// Create and add the event and grid
+			// lanes to the lane group.
+			renderSingleCalendarLane(laneGroup, groupData, settings);
+			calendarData.append(laneGroup);
+		}
+	};
+
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
 	var renderCalendar = function($this, settings) {
 		var elementId = $this.attr('id');
 
@@ -172,10 +228,8 @@
 		if (elementId === "subgroups")
 			return;
 
-		
 		// ----------------------------------
-		// Step 1: 
-		// Setup calendar structure
+		// Setup calendar structure.
 		// ----------------------------------
 		var calendarContainer = jQuery('<div/>', {class: 'calendar-container'});
 		var calendarScroller = jQuery('<div/>', {class: 'calendar-scroller'});
@@ -189,41 +243,36 @@
 		calendarContainer.prepend(calendarScroller);
 		calendarScroller.prepend(calendarData);
 
-
-
 		// ----------------------------------
-		// Step 2:
 		// Fetch the EventOccurence data and
-		// grouping heirarchy.
+		// grouping heirarchy and generate
+		// the calendar.
 		// ----------------------------------
 		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.events.json')
-		.done(function(data) {
+		.done(function(eventData) {
 			// Parse and massage the data
 
-			
-			// ----------------------------------
-			// Step 3: 
-			// Dynamically generate the calendar
-			// grid
-			// ----------------------------------
-			renderCalendarGrid (calendarData, data, settings);
 
-			//renderEventOccurrences (calendarData, data, settings);
-
-			// Bind hover over handler
-
+			// Render calendar
+			renderCalendarLanes(calendarData, eventData, settings);
 		})
+
 		.fail(function(jqXHR, textStatus, errorThrown) {
+			// Should probably have some sort
+			// of intelligent failure handler
+			// here.
 			console.log(textStatus);
 			console.log(errorThrown);
 		});
 	};
 
-
-
-
-
-	// Initialize Scheduler 
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
 	var initializeScheduler = function(options) {
 		this.addClass('fdScheduler-enabled').each(function() {
 
@@ -280,7 +329,6 @@
 				});
 			}
 
-			// Genereate the grid
 			renderCalendar($this, settings);
 
 			// Bind event Handlers
@@ -297,36 +345,4 @@
 		return this;
 	};	// end $.fn.frontdeskCalendar
  
-})( jQuery ); 
-
-
-
-
-
-
-/**
- * JSON Object: Event Occurence
- *
- *
- var eventOccurrence =
- {
-	id : "",
-	startDate : "",
-	endDate : "",
-	name : "",
-	
-	staff :
-	{
-		id : "",
-		firstName : "",
-		lastName : "",
-		fullName : ""
-	},
-	
-	location :
-	{
-		id : "",
-		name : ""
-	}
- };
- */
+})( jQuery );
