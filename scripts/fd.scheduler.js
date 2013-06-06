@@ -63,73 +63,69 @@
 	// Bind event handlers for event occurrences
 
 
+
+
+	// TODO :: rkim :: 04-Jun-2013
+	// Define all the styles used in the rendering
+	// of the calendar here.
+	var cssClasses = {
+
+	};
+
+
 	// Render the event data
-	var renderEventOccurrences = function(calendarLanes, data, settings)
-	{
-		console.log(calendarLanes);
-		console.log(data);
+	var renderEventOccurrences = function(eventLanes, eventData, settings) {
+		console.log(eventData);
 		console.log(settings);
 
-	}
+		//
+		//eventData.subgroups
 
 
-	// Render the grid
-	var renderCalendarGrid = function($this, settings) {
-		var elementId = $this.attr('id');
+	};
 
-		// Bail for subgroups for now
-		if (elementId === "subgroups")
-			return;
+	var renderScheduleLanes = function(scheduler, eventData, settings) {
 
-		// TODO :: rkim :: 04-Jun-2013
-		// Define all the styles used in the rendering
-		// of the calendar here.
-		var cssClasses = {
+	};
 
-		};
-		
-		// ----------------------------------
-		// Step 1: 
-		// Setup calendar structure
-		// ----------------------------------
-		var $calendarContainer = jQuery('<div/>', {class: 'calendar-container'});
-		var $calendarScroller = jQuery('<div/>', {class: 'calendar-scroller'});
-		var $calendarData = jQuery ('<div/>', {class: 'calendar-data'});
-		var $laneColumn = jQuery('<div/>', {class: 'lane-column'});
-
-		// Pre-pend these elements for now since
-		// the lane-column element is hard-coded
-		// in the HTML file for the time being
-		$this.prepend($calendarContainer);
-		$calendarContainer.prepend($calendarScroller);
-		$calendarScroller.prepend($calendarData);
-
-		
-		// ----------------------------------
-		// Step 2: 
-		// Dynamically generate the calendar
-		// grid
-		// ----------------------------------
+	var renderCalendarGrid = function(calendarData, eventData, settings) {
+		// Should I derive this from the event-occurrence data?
+		// Probably not. Business configuration information is
+		// best left out of the event data imo.
+		//
+		// What do we do if a one-off event is scheduled after
+		// standard business hours?
 		var startHour = settings.timeStart;
 		var endHour = settings.timeEnd;
-		if (endHour <= startHour)
-			console.log("error: end of day is before or equal to start of day.");
+
+
+		// The subgroup loop...
+		//
+		// For now, assume we'll won't see nested subloops. They're
+		// totally possible given the data structure, but I've no
+		// pressing desire or need to over-complicate the code here
+		// for a possibility.
+		var subgroupIndex = 0;
+		var numSubGroups = eventData.subgroups.length;
+		for (subgroupIndex = 0; subgroupIndex < numSubGroups; subgroupIndex++) {
+
+		}
 
 		// Start by rendering in the time row into the
 		// calendar. Make sure localized time strings
 		// can be supported.
-		var $timeLane = jQuery('<div/>', {class: 'time-lane'});
+		var timeLane = jQuery('<div/>', {class: 'time-lane'});
 
 		var currentHour = startHour;
 		while(currentHour++ < endHour) {
-			var $timeCell = jQuery('<div/>', {
+			var timeCell = jQuery('<div/>', {
 				class:'time-label',
 				text: currentHour + ':00'});
 
-			$timeLane.append($timeCell);
+			timeLane.append(timeCell);
 		}
-		$calendarData.append($timeLane);
-		$calendarData.append(jQuery('<div/>',{class:'time-spacer'}));
+		calendarData.append(timeLane);
+		calendarData.append(jQuery('<div/>',{class:'time-spacer'}));
 
 
 		// Assume the calendar grid is broken into 30m
@@ -164,19 +160,55 @@
 			}
 			calLane.append(gridLane);
 		});
-		$calendarData.append(calendarLanes);
+		calendarData.append(calendarLanes);
+	};
+
+
+	// Render the grid
+	var renderCalendar = function($this, settings) {
+		var elementId = $this.attr('id');
+
+		// Bail for subgroups for now
+		if (elementId === "subgroups")
+			return;
+
+		
+		// ----------------------------------
+		// Step 1: 
+		// Setup calendar structure
+		// ----------------------------------
+		var calendarContainer = jQuery('<div/>', {class: 'calendar-container'});
+		var calendarScroller = jQuery('<div/>', {class: 'calendar-scroller'});
+		var calendarData = jQuery ('<div/>', {class: 'calendar-data'});
+		var laneColumn = jQuery('<div/>', {class: 'lane-column'});
+
+		// Pre-pend these elements for now since
+		// the lane-column element is hard-coded
+		// in the HTML file for the time being
+		$this.prepend(calendarContainer);
+		calendarContainer.prepend(calendarScroller);
+		calendarScroller.prepend(calendarData);
+
+
 
 		// ----------------------------------
-		// Step 3:
-		// Populate the calendar with events
+		// Step 2:
+		// Fetch the EventOccurence data and
+		// grouping heirarchy.
 		// ----------------------------------
 		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.events.json')
 		.done(function(data) {
 			// Parse and massage the data
 
+			
+			// ----------------------------------
+			// Step 3: 
+			// Dynamically generate the calendar
+			// grid
+			// ----------------------------------
+			renderCalendarGrid (calendarData, data, settings);
 
-			// Render event data
-			renderEventOccurrences (calendarLanes, data, settings);
+			//renderEventOccurrences (calendarData, data, settings);
 
 			// Bind hover over handler
 
@@ -185,26 +217,11 @@
 			console.log(textStatus);
 			console.log(errorThrown);
 		});
-
-
-		// Note :: rkim :: 04-Jun-2013
-		// These load elements will be quickly replaced
-		// by js rendering routines off JSON data. 
-		/*
-		$.get('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.calendar.html',
-			function(data){
-				$calendarData.append(data);
-			}
-		);
-
-		$this.append($laneColumn);
-		$.get('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.lanes.html',
-			function(data){
-				$laneColumn.append(data);
-			}
-		);
-		*/
 	};
+
+
+
+
 
 	// Initialize Scheduler 
 	var initializeScheduler = function(options) {
@@ -264,7 +281,7 @@
 			}
 
 			// Genereate the grid
-			renderCalendarGrid($this, settings);
+			renderCalendar($this, settings);
 
 			// Bind event Handlers
 			$this.find('.event').click(function(e) {
