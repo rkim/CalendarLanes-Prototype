@@ -78,17 +78,169 @@
 	 *
 	 */
 	var renderEventOccurrences = function(eventLane, eventOccurrences, settings) {
-		console.log(eventOccurrences);
 
-		// First, sort and build the event-
-		// occurrence tree
+		// Sanity check inputs
+		if (eventLane === null || eventOccurrences === null ||
+			settings === null || eventOccurrences.length === 0) {
+			console.log("error: invalid input to renderEventOccurrences");
+			return;
+		}	
 
-		// Now query the calendar to determine
-		// lane widths...or should that be from
-		// settings?
+		var eventIndex = 0;
+		var numEvents = eventOccurrences.length;
 
-		// Set the horizontal offsets for each
-		// of the events.
+		// Step 0.
+		// Convert event dates from Strings to javascript
+		// Date objects.
+		for (eventIndex = 0; eventIndex < numEvents; eventIndex++) {
+			var event = eventOccurrences[eventIndex];
+			event.startDate = new Date(event.startDate);
+			event.endDate = new Date(event.endDate);
+		}
+
+		// Step 1.
+		// Sort the array of event occurrences
+		var eventSortComparator = function(e1, e2) {
+			if (e1.startDate.getTime() === e2.startDate.getTime()) {
+				if (e1.endDate.getTime() === e2.endDate.getTime()) {
+					return (e1.name >= e2.name) ? 1 : -1;
+				}
+				else {
+					return (e1.endDate.getTime() < e2.endDate.getTime()) ? 1 : -1;
+				}
+			}
+			else {
+				return (e1.startDate.getTime() > e2.startDate.getTime()) ? 1 : -1;
+			}
+		}
+		eventOccurrences.sort(eventSortComparator);
+
+		// Step 2.
+		// Construct the event occurrence "stacks".
+		//
+		// This isn't really a stack. The name serves to describe
+		// the idea that all events in this structure are "stacked"
+		// on top of each other in the calendar due to overlaps in
+		// time.
+		//
+		// TODO :: rkim :: 04-Jun-2013
+		// Test the shit out of this. This is the important,
+		// meaty part.
+		var eventStack = function(event) {
+			var stack = {
+				depth: 0,
+
+				// May want validation of types
+				// and data here.
+				startDate: event.startDate,
+				endDate: event.endDate,
+				eventList: new eventNode(event),
+				topEventNode: this.eventList,
+
+				// Heavy lifting happens here...
+				//
+				// We can trust that events added to this stack 
+				// have already been sorted by time.
+				addEvent: function(event) {
+					console.log(event);
+
+					var nodeAdded = false;
+					while (!nodeAdded && this.topEventNode != null)
+					{
+						// Add the event to topEventNode if the start dates are
+						// the same.
+						if (this.topEventNode.startDate.getTime() === event.startDate.getTime()) {
+							this.topEventNode.addEvent(event);
+
+							nodeAdded = true;
+						}
+
+						// Otherwise, add a new node to the stack if overlap between
+						// topEventNode and the current event exists.
+						else if (this.topEventNode.endDate.getTime() > event.startDate.getTime()) {
+							var newEventNode = eventNode(event);
+							this.topEventNode.next = newEventNode;
+							newEventNode.prev = this.topEventNode;
+							this.topEventNode = newEventNode;
+
+							nodeAdded = true;
+							depth++;
+						}
+						// Else, step up one level and try again.
+						else 
+						{
+							topEventNode = topEventNode.prev;
+						}
+					}
+
+				}
+			};
+
+			// Initialization
+			console.log("creating stack");
+			console.log(event);
+			return stack;
+		};
+
+		// This isn't really necessary, but serves to 
+		// break out the linked list functionality out of
+		// eventStack.
+		var eventNode = function(event) {
+			return {
+				startDate: event.startDate,
+				endDate: event.endDate,
+
+				events: [event],
+				prev: null,
+				next: null,
+
+				addEvent: function(event) {
+					events.push(event);
+
+					// Check and extend the end date of this
+					// collection of events 
+					if (endDate < event.endDate)
+						endDate = event.endDate;
+				}
+			};
+		};
+
+
+
+
+
+
+
+
+
+
+
+
+
+		// Initialize the event stack
+		var event = eventOccurrences[0];
+		var eventStacks = new Array();
+		var currentStack = eventStack(event);
+		eventStacks.push(currentStack);
+
+		for (eventIndex = 1; eventIndex < numEvents; eventIndex++) {
+			event = eventOccurrences[eventIndex];
+
+			// Overlap detected
+			if (currentStack.endDate > event.startDate) {
+				currentStack.addEvent(event);
+			}
+
+			// Start new stack
+			else {
+				currentStack = eventStack(event);
+				eventStacks.push(currentStack);
+			}
+		}
+
+		// Step 3.
+		// Generate event occurrences from the event stacks.
+
 	};
 
 	/**
