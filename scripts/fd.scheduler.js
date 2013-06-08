@@ -141,16 +141,15 @@
 			$this.data(SETTINGS_KEY, settings);
 			if (settings.hardwareAcceleration) {
 				$this.css({
-					'-webkit-transform': 'translate3d(0,0,0)',
-					'-webkit-perspective': '1000',
-					'-webkit-backface-visibility': 'hidden'
+					"-webkit-transform": "translate3d(0,0,0)",
+					"-webkit-perspective": "1000",
+					"-webkit-backface-visibility": "hidden"
 				});
 			}
-
 			renderCalendar($this, settings);
 
 			// Bind event Handlers
-			$this.find('.event').click(function(e) {
+			$this.find(".event").click(function(e) {
 				console.log(e.clientX + ", " + e.clientY);
 			});
 
@@ -165,8 +164,8 @@
 	 *
 	 *
 	 */
-	var renderCalendar = function($this, settings) {
-		var elementId = $this.attr('id');
+	var renderCalendar = function($calendar, settings) {
+		var elementId = $calendar.attr("id");
 
 		// Bail for subgroups for now
 		if (elementId === "subgroups")
@@ -175,43 +174,42 @@
 		// ---------------------------------------------------------
 		// Setup calendar structure.
 		// ---------------------------------------------------------
-		var calendarContainer = jQuery('<div/>', {class: 'calendar-container'});
-		var calendarScroller = jQuery('<div/>', {class: 'calendar-scroller'});
-		var calendarData = jQuery ('<div/>', {class: 'calendar-data'});
-		var laneColumn = jQuery('<div/>', {class: 'lane-column'});
+		var $calendarContainer = jQuery("<div/>", {class: "calendar-container"});
+		var $calendarScroller = jQuery("<div/>", {class: "calendar-scroller"});
+		var $calendarData = jQuery ("<div/>", {class: "calendar-data"});
+		var $laneColumn = jQuery("<div/>", {class: "lane-column"});
 
-		// Pre-pend these elements for now since the lane-column 
-		// element is hard-coded in the HTML file for the time being
-		$this.prepend(calendarContainer);
-		calendarContainer.prepend(calendarScroller);
-		calendarScroller.prepend(calendarData);
+		$calendar.append($calendarContainer);
+		$calendar.append($laneColumn);
+
+		$calendarContainer.append($calendarScroller);
+		$calendarScroller.append($calendarData);
 
 		// ---------------------------------------------------------
 		// Fetch the EventOccurence data and
 		// grouping heirarchy and generate
 		// the calendar.
 		// ---------------------------------------------------------
-		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/basic.events.json')
+		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/groups.events.json')
 			.done(function(eventData) {
-				var startTime = settings.startTime;
-				var endTime = settings.endTime;
+				var startDate = settings.startTime;
+				var endDate = settings.endTime;
 
 				// Parse and massage the data, detect and alert on
 				// errors, etc...
 				eventData.subgroups.map(function(group) {
 					group.lanes.map(function(lane) {
 						lane.events.map(function(event) {
+
 							// Convert dates to objects
 							event.startDate = new Date(event.startDate);
 							event.endDate = new Date(event.endDate);
 
 							// Check and extend the range of times to display
-							// This works because javascript is not multi-
-							// threaded.
-							if (startTime.getTime() > event.startDate.getTime())
-								startTime = event.startDate;
-							if (endTime.getTime() < event.endDate.getTime())
-								endTime = event.endDate;
+							if (startDate.getTime() > event.startDate.getTime())
+								startDate = event.startDate;
+							if (endDate.getTime() < event.endDate.getTime())
+								endDate = event.endDate;
 						});
 					});
 				});
@@ -219,15 +217,18 @@
 				// Business hours do not necessarily have to start and end
 				// on the hour, but we'll snap to the hour mark for display
 				// consistency.
-				if (endTime.getMinutes() > 0)
-					endTime++;
+				if (startDate.getMinutes() > 0)
+					startDate.setHours(startDate.getHours(), 0, 0, 0);
+				if (endDate.getMinutes() > 0)
+					endDate.setHours(endTime.getHours()+1);
 
 				// Extend the time range of the calendar if necessary.
-				settings.startTime = startTime;
-				settings.endTime = endTime;
+				settings.startTime = startDate;
+				settings.endTime = endDate;
 
-				// Render everything
-				renderLaneGroups(calendarData, eventData, settings);
+				// Render...everything!!
+				renderLaneColumn($laneColumn, eventData, settings);
+				renderLaneGroups($calendarData, eventData, settings);
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
 				// Should probably have some sort of intelligent failure
@@ -244,7 +245,7 @@
 	 *
 	 *
 	 */
-	var renderLaneGroups = function(calendarData, eventData, settings) {
+	var renderLaneGroups = function($calendarData, eventData, settings) {
 
 		// The lane-group loop...
 		//
@@ -259,25 +260,20 @@
 			// --------------------------------------
 			// Group header
 			var groupData = eventData.subgroups[groupIndex];
-			var laneGroup = jQuery('<div/>', {
-				class:'lane-group',
-				id:'subroup-' + groupIndex,
+			var $laneGroup = jQuery("<div/>", {
+				class: "lane-group",
+				id: "group-" + groupIndex,
 			});
-			// Add a spacer if the subgroup is to be displayed
 			if (groupData.displayHeader) {
-				laneGroup.append(jQuery('<div/>', {class:'subgroup-spacer'}));
+				$laneGroup.append(jQuery("<div/>", {class: "subgroup-spacer"}));
 			}
 
 			// --------------------------------------
-			// Time lane
-			renderTimeLane(laneGroup, settings);
+			// Render time and calendar lanes
+			renderTimeLane($laneGroup, groupData, settings);
+			renderCalendarLanes($laneGroup, groupData, settings);
 
-			// --------------------------------------
-			// Create and add the event and grid lanes
-			// to the lane group.
-			renderCalendarLanes(laneGroup, groupData, settings);
-
-			calendarData.append(laneGroup);
+			$calendarData.append($laneGroup);
 		}
 	};
 
@@ -289,32 +285,31 @@
 	 *
 	 *
 	 */
-	var renderCalendarLanes = function(laneGroup, groupData, settings) {
+	var renderCalendarLanes = function($laneGroup, groupData, settings) {
 		
-		// Build the calendar lanes
 		var laneIndex = 0;
 		var numberOfLanes = groupData.lanes.length;
 		for (laneIndex = 0; laneIndex < numberOfLanes; laneIndex++)
 		{
-			var calendarLane = jQuery('<div/>', {
-				id:'basic-calendar-lane-'+laneIndex,
-				class:'calendar-lane'});
+			var $calendarLane = jQuery("<div/>", {
+				id: "basic-calendar-lane-" + laneIndex,
+				class: "calendar-lane"});
 
 			// Create and add event lane
-			var eventLane = jQuery('<div/>', {class:'event-lane'});
+			var $eventLane = jQuery('<div/>', {class: "event-lane"});
 			var eventOccurrences = groupData.lanes[laneIndex].events;
 			console.log ("lane: "+laneIndex);
 			if (eventOccurrences.length > 0) {
-				renderEventOccurrences(eventLane, eventOccurrences, settings);
+				renderEventOccurrences($eventLane, eventOccurrences, settings);
 			}
-			calendarLane.append(eventLane);
+			$calendarLane.append($eventLane);
 
 			// Create and add grid lane
-			var gridLane = jQuery('<div/>', {class:'grid-lane'});
-			renderGridLines(gridLane, settings);
-			calendarLane.append(gridLane);
-
-			laneGroup.append(calendarLane);
+			var $gridLane = jQuery("<div/>", {class: "grid-lane"});
+			renderGridLane($gridLane, settings);
+			
+			$calendarLane.append($gridLane);
+			$laneGroup.append($calendarLane);
 		}
 	};
 
@@ -460,15 +455,14 @@
 
 	 	// Display config variables;
 	 	var config = {
-	 		height: '65px',
-	 		width: '180px',
-			left:'',
-			top:'',	 		
+	 		height: "65px",
+	 		width: "180px",
+			left: "0px",
+			top: "0px",	 		
 
 	 		stacked: false,
 	 		hideDetails:false
 	 	};
-
 
 	 	// Compute offsets
 	 	var cellsPerHour = settings.divisionsPerHour;
@@ -487,8 +481,6 @@
 	 	// Initialize offset at the start of the business day
 	 	var calStartOffset = minutesPerCell * pixelsPerMinute;
 
-
-
 	 	// Iterate over each 'stack' of events in the tree
 	 	$eventTree.each(function(treeIndex, stack) {
 
@@ -506,8 +498,6 @@
 				maxDepth = Math.max(maxDepth, eventNode.depth);
 			}
 			console.log("  stack: "+treeIndex+" depth: "+maxDepth);
-
-
 
 			// do it all over again... we can simplify this
 			var eventNodesToRender = [stack];
@@ -565,7 +555,72 @@
 			} // while (eventNodesToRender ...)
 
 	 	}); // $eventTree.each
+	 }
 
+
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
+	 var renderLaneColumn = function($laneColumn, eventData, settings) {
+
+	 	var $groups = $(eventData.subgroups);
+
+	 	//
+	 	//
+	 	//
+	 	//
+	 	$groups.each(function(groupIndex, group) {
+	 		var $groupDiv = jQuery("<div/>", {class: "grouping"});
+
+	 		// Render the group headers if enabled
+	 		if (group.displayHeader) {
+	 			var $groupLane = jQuery("<div/>", {class: "subgroup-lane"});
+	 			
+	 			var groupLabelClass = "subgroup-label";
+	 			if (groupIndex === 0)
+	 			 	groupLabelClass += " first";
+
+	 			var $groupLabel = jQuery("<div/>", {
+	 				class: groupLabelClass,
+	 				text: group.headerLabel
+	 			});
+
+	 			var $groupSpacer = jQuery("<div/>", {class: "subgroup-spacer"})
+	 			$groupLane.append($groupLabel);
+	 			$groupDiv.append($groupLane);
+	 			$groupDiv.append($groupSpacer);
+	 		}
+
+	 		// Render the time lane
+	 		var $timeLane = jQuery("<div/>", {class:"time-lane"});
+	 		var timeLabelClass = "time-label border";
+	 		if (group.displayHeader) {
+	 			timeLabelClass += " subgroup";
+	 		}
+	 		var $timeLabel = jQuery("<div/>", {class: timeLabelClass});
+	 		var $timeSpacer = jQuery("<div/>", {class: "time-spacer"});
+	 		$timeLane.append($timeLabel);
+	 		$groupDiv.append($timeLane);
+	 		$groupDiv.append($timeSpacer);
+
+	 		// Render the lane names
+	 		$(group.lanes).each(function(groupIndex, lane) {
+	 			console.log("     lane")
+	 			var $laneDiv = jQuery("<div/>", {class: "lane"});
+	 			var $laneLabel = jQuery("<div/>", {
+	 				class:"lane-label",
+	 				text:lane.name});
+	 			$laneDiv.append($laneLabel);
+	 			$groupDiv.append($laneDiv);
+	 		});
+
+	 		// Add the whole thing to the lane column
+	 		$laneColumn.append($groupDiv);
+	 	});
 	 }
 
 
@@ -620,16 +675,27 @@
 			text: startTimeString});
 		var spanDash = jQuery('<span/>', {
 			class:'dash'});
+		var endTimeString = event.endDate.getHours().toString();
+		if (event.endDate.getMinutes() > 0) {
+			endTimeString += ":"+event.endDate.getMinutes().toString();
+		}
 		var spanEndAt = jQuery('<span/>', {
 			class:'end_at',
-			text:'11:30am'});
+			text: endTimeString});
+
+		var staffString = ' w/';
+		event.staff.map(function(staff){
+			staffString += ' ' + staff.name;
+		});
 		var eventStaff = jQuery('<span/>', {
-			text:' /w Staff 1 & Staff 3'});
+			text:staffString});
+
 		var eventName = jQuery('<strong/>', {
-			text:' Class A'})
+			text: ' '+event.name})
+
 		var eventLocation = jQuery('<span/>', {
 			class:'location',
-			text:' - Los Angeles'});
+			text:' - '+event.location});
 
 		// Associate event elements
 		eventTime.append(spanStartAt);
@@ -655,26 +721,33 @@
 	 * Time labels are to be fixed to 2 hour divisions wide,
 	 * with paddings to be inserted between them.
 	 */
-	var renderTimeLane = function(laneGroup, settings) {
-
+	var renderTimeLane = function($laneGroup, groupData, settings) {
+		
+		var displayGroupHeaders = groupData.displayHeader;
 		var startHour = settings.startTime.getHours();
 		var endHour = settings.endTime.getHours();
 
 		// Start by rendering in the time row into the calendar.
 		// Make sure localized time strings can be supported.
-		var timeLane = jQuery('<div/>', {class:'time-lane'});
+		var $timeLane = jQuery('<div/>', {class: "time-lane"});
 		var currentHour = startHour;
 		while(currentHour <= endHour) {
 
-			var timeCell = jQuery('<div/>', {
-				class:'time-label',
-				text: currentHour + ':00'});
-			timeLane.append(timeCell);
+			// Build the class string for the time lane
+			var classString = "time-label";
+			if (displayGroupHeaders)
+				classString += " subgroup";
+
+			// 
+			var $timeCell = jQuery("<div/>", {
+				class: classString,
+				text: currentHour + ":00"});
+			$timeLane.append($timeCell);
 
 			// 
 			if (settings.divisionsPerHour > 2) {
-				var timePadding = jQuery('<div/>', {class:'time-padding'});
-				timeLane.append(timePadding);
+				var $timePadding = jQuery("<div/>", {class:"time-padding"});
+				$timeLane.append($timePadding);
 			}
 			currentHour++;
 		}
@@ -683,15 +756,16 @@
 		// time lane.
 		var timeLabelWidth = 2 * settings.divisionWidth;
 		var timePadding = (settings.divisionsPerHour - 2) * settings.divisionWidth;
-
 		timeLabelWidth = timeLabelWidth.toString() + "px";
-		timeLane.find('.time-label').css({
-			'width':timeLabelWidth,
-			'min-width':timeLabelWidth,
-			'max-width':timeLabelWidth});
 
-		laneGroup.append(timeLane);
-		laneGroup.append(jQuery('<div/>', {class:'time-spacer'}));
+		$timeLane.find(".time-label").css({
+			"width": timeLabelWidth,
+			"min-width": timeLabelWidth,
+			"max-width": timeLabelWidth});
+		$timeSpacer = jQuery("<div/>", {class: "time-spacer"});
+
+		$laneGroup.append($timeLane);
+		$laneGroup.append($timeSpacer);
 	}
 
 	/**
@@ -701,7 +775,7 @@
 	 *
 	 *
 	 */
-	var renderGridLines = function (gridLane, settings)
+	var renderGridLane = function ($gridLane, settings)
 	{
 		var startHour = settings.startTime.getHours();
 		var endHour = settings.endTime.getHours();
@@ -711,10 +785,10 @@
 		numberOfCells += 2;	// For the gutters
 
 		var gridIndex = 0;
-		var classString = 'grid start';
+		var gridClass = "grid start";
 		while (gridIndex < numberOfCells) {
-			gridLane.append(jQuery('<div/>', {class:classString}));
-			classString = 'grid';
+			$gridLane.append(jQuery("<div/>", {class: gridClass}));
+			gridClass = "grid";
 
 			// Set class string for the next iteration through
 			//
@@ -722,7 +796,7 @@
 			// This isn't correct for any value of cellsPerHour
 			// greater than 0.
 			if (gridIndex % cellsPerHour !== 0)
-				classString += ' mid';
+				gridClass += ' mid';
 
 			gridIndex++;
 		}

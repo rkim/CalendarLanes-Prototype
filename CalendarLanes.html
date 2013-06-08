@@ -38,9 +38,6 @@
 
 			// -----------------------------
 			// Front Desk Scheduler!
-			var calStartTime = new Date();
-			var calEndTime = new Date();
-
 			$('.scheduler').fdScheduler();
 
 			// -----------------------------
@@ -59,12 +56,9 @@
 			// All this will eventually get
 			// packaged up into a jQuery plugin.
 			var expandedEvents = new Array();
-			var collapseEvents = function()
-			{
-				if (expandedEvents.length > 0)
-				{	
-					while(expandedEvents.length > 0)
-					{
+			var collapseEvents = function() {
+				if (expandedEvents.length > 0) {	
+					while(expandedEvents.length > 0) {
 						var event = expandedEvents.pop();
 						var $this = $(event);
 
