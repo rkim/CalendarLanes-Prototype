@@ -9,24 +9,24 @@
 ;(function($){
 
 /**
+ * fdScheduler
+ * ----------------------------------------------------------------------------------
  *
- * TODO :: rkim :: 31-May-2013
+ * jQuery plugin that creates, loads, and renders a configurable calendar of events 
+ * within a <div/>.
  *
- * A long and useful commemnt on how all this works
+ * Though I'd like to make this a bit more portable and reusable, time constraints
+ * require that I hard-code dependencies on certain CSS classes and so forth.
  *
- * ---
- *
- * Though I'd like to make all this fairly generic,
- * time constraints demand I bake-in dependencies on
- * certain CSS classes and so forth. Oh well.
- *
- *
+ * ----------------------------------------------------------------------------------
+ * Class hierarchy for the event scheduler
+ * ----------------------------------------------------------------------------------
  *
  *	scheduler
  *		calendar-container
  *			calendar-scroller
  *				calendar-data
- *					subgroup
+ *					group
  *						time-lane
  *						calendar-lane
  *							event-lane
@@ -38,12 +38,56 @@
  *						...
  *					...
  *		lane-column
- *			subgroup
+ *			group
  *				time-lane
  *				lane
  *			...
  *
+ * ----------------------------------------------------------------------------------
+ * Parameters
+ * ----------------------------------------------------------------------------------
+ *   horizLayout           : 
+ *                         : 
+ * ..................................................................................
+ *   gridHoverOn           : 
+ *                         : 
+ * ..................................................................................
+ *   drawEvents            : 
+ *                         : 
+ * ..................................................................................
+ *   hardwareAcceleration  : 
+ *                         : 
+ * ..................................................................................
+ *   minHeight             : 
+ *                         : 
+ * ..................................................................................
+ *   maxHeight             : 
+ *                         : 
+ * ..................................................................................
+ *   maxWidth              : 
+ *                         : 
+ * ..................................................................................
+ *   minWidth              : 
+ *                         : 
+ * ..................................................................................
+ *   divisionsPerHour      : 
+ *                         : 
+ * ..................................................................................
+ *   divisionWidth         : 
+ *                         : 
+ * ..................................................................................
+ *   laneHeight            : 
+ *                         : 
+ * ..................................................................................
+ *   startTime             : 
+ *                         : 
+ * ..................................................................................
+ *   endTime               : 
+ *                         : 
+ * ----------------------------------------------------------------------------------
+ *
  */
+
 	var DEFAULT_SETTINGS = {
 		horizLayout: true,
 		gridHoverOn: true,
@@ -77,23 +121,23 @@
 
 	};
 
-
-
-	// Register fdScheduler 
+	/**
+	 * $.fn.fdScheduler
+	 * ----------------------------------------------------------------------------------
+	 *
+	 */
 	$.fn.fdScheduler = function(options) {
 		initializeScheduler.call(this, options);
 		return this;
 	};	// end $.fn.frontdeskCalendar
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * intializeScheduler
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
 	var initializeScheduler = function(options) {
-		this.addClass('fdScheduler-enabled').each(function() {
+		this.addClass("fdScheduler-enabled").each(function() {
 			var $this = $(this);
 
 			// Check if the element has already been initialized for
@@ -104,8 +148,7 @@
 			// Extend default settings
 			var settings = $.extend({}, DEFAULT_SETTINGS, options);
 
-			// ---------------------------------------------------------
-			// Handlers for most events that I think will be  relevant.
+			// Handlers for most events that I think will be relevant.
 			// Pretty sure some of these will not be used.
 			settings.events = {
 				touchStart: function(e) {
@@ -146,6 +189,8 @@
 					"-webkit-backface-visibility": "hidden"
 				});
 			}
+
+			// Render the thing
 			renderCalendar($this, settings);
 
 			// Bind event Handlers
@@ -154,21 +199,18 @@
 			});
 
 		});	// this.each(function...)
-	};
-
+	}; // initializeScheduler
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * renderCalendar
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
 	var renderCalendar = function($calendar, settings) {
 		var elementId = $calendar.attr("id");
 
-		// Bail for subgroups for now
-		if (elementId === "subgroups")
+		// Bail for groups for now
+		if (elementId === "groups")
 			return;
 
 		// ---------------------------------------------------------
@@ -191,13 +233,19 @@
 		// the calendar.
 		// ---------------------------------------------------------
 		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/groups.events.json')
+
+			// Successfully retrieved event data
 			.done(function(eventData) {
 				var startDate = settings.startTime;
 				var endDate = settings.endTime;
 
 				// Parse and massage the data, detect and alert on
 				// errors, etc...
-				eventData.subgroups.map(function(group) {
+				//
+				// TODO :: rkim :: 08-Jun-2013
+				// It'd be prudent to break this out into a separate
+				// function better suited to handling error detection.
+				eventData.groups.map(function(group) {
 					group.lanes.map(function(lane) {
 						lane.events.map(function(event) {
 
@@ -230,19 +278,21 @@
 				renderLaneColumn($laneColumn, eventData, settings);
 				renderLaneGroups($calendarData, eventData, settings);
 			})
+
+			// Shit went wrong. What should I do? Fail.
+			//
+			// TODO :: rkim :: 08-Jun-2013
+			// Add something resembling an error handler here though.
 			.fail(function(jqXHR, textStatus, errorThrown) {
-				// Should probably have some sort of intelligent failure
-				//  handler here.
+
 				console.log(textStatus);
 				console.log(errorThrown);
 			});
 	};
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * renderLaneGroups
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
 	var renderLaneGroups = function($calendarData, eventData, settings) {
@@ -253,88 +303,84 @@
 		// possible given the data structure, but I've no pressing
 		// desire or need to over-complicate the code here for a
 		// possibility.
-		var groupIndex = 0;
-		var numLaneGroups = eventData.subgroups.length;
-		for (groupIndex = 0; groupIndex < numLaneGroups; groupIndex++) {
-			
-			// --------------------------------------
+		$(eventData.groups).each(function(groupIndex, groupData) {
+
 			// Group header
-			var groupData = eventData.subgroups[groupIndex];
 			var $laneGroup = jQuery("<div/>", {
 				class: "lane-group",
-				id: "group-" + groupIndex,
-			});
+				id: "group-" + groupIndex});
+
 			if (groupData.displayHeader) {
-				$laneGroup.append(jQuery("<div/>", {class: "subgroup-spacer"}));
+				$laneGroup.append(jQuery("<div/>", {class: "group-spacer"}));
 			}
 
-			// --------------------------------------
 			// Render time and calendar lanes
 			renderTimeLane($laneGroup, groupData, settings);
 			renderCalendarLanes($laneGroup, groupData, settings);
 
 			$calendarData.append($laneGroup);
-		}
+		});
 	};
 
 
 	/**
 	 *
 	 *
-	 *
-	 *
-	 *
 	 */
 	var renderCalendarLanes = function($laneGroup, groupData, settings) {
-		
-		var laneIndex = 0;
-		var numberOfLanes = groupData.lanes.length;
-		for (laneIndex = 0; laneIndex < numberOfLanes; laneIndex++)
-		{
+			
+		$(groupData.lanes).each(function(laneIndex, laneData) {
+			var events = laneData.events;
+
+			// Calendar lane that'll encapsulate both the event and grid lanes
+			//
+			// TODO :: rkim :: 08-Jun-2013 
+			// Will need a better, unique-r id.
 			var $calendarLane = jQuery("<div/>", {
-				id: "basic-calendar-lane-" + laneIndex,
+				id: "calendar-lane-" + laneIndex,
 				class: "calendar-lane"});
 
 			// Create and add event lane
 			var $eventLane = jQuery('<div/>', {class: "event-lane"});
-			var eventOccurrences = groupData.lanes[laneIndex].events;
-			console.log ("lane: "+laneIndex);
-			if (eventOccurrences.length > 0) {
-				renderEventOccurrences($eventLane, eventOccurrences, settings);
+			console.log ("lane: " + laneIndex);
+			if (events.length > 0) {
+				renderEventOccurrences($eventLane, events, settings);
 			}
 			$calendarLane.append($eventLane);
 
 			// Create and add grid lane
 			var $gridLane = jQuery("<div/>", {class: "grid-lane"});
 			renderGridLane($gridLane, settings);
-			
 			$calendarLane.append($gridLane);
+
+			// Add the new calendar lane to the lane group
 			$laneGroup.append($calendarLane);
-		}
+		});
 	};
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * renderEventOccurrences
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
-	var renderEventOccurrences = function(eventLane, eventOccurrences, settings) {
-
-		// Sanity check inputs
-		if (eventLane === null || eventOccurrences === null ||
-			settings === null || eventOccurrences.length === 0) {
-			console.log("error: invalid input to renderEventOccurrences");
-			return;
-		}	
+	var renderEventOccurrences = function($eventLane, eventOccurrences, settings) {
 
 		var eventIndex = 0;
 		var numEvents = eventOccurrences.length;
 
 		// ---------------------------------------------------------
 		// Step 1.
-		// Sort the array of event occurrences
+		// Sort the array of event occurrences. Events will be ordered
+		// by the following criteria:
+		//
+		//    a. earlier event start time
+		//    b. later event end time
+		//    c. event name
+		//
+		// This is important since much of the following logic relies
+		// on the premise that the events are sorted by time in that
+		// specific order.
+		// ---------------------------------------------------------
 		var eventSortComparator = function(e1, e2) {
 			if (e1.startDate.getTime() === e2.startDate.getTime()) {
 				if (e1.endDate.getTime() === e2.endDate.getTime()) {
@@ -352,7 +398,7 @@
 
 		// ---------------------------------------------------------
 		// Step 2.
-		// Construct the event occurrence "stacks".
+		// Construct the "event tree."
 		//
 		// This isn't really a stack. The name serves to describe
 		// the idea that all events in this structure are "stacked"
@@ -362,6 +408,7 @@
 		// TODO :: rkim :: 04-Jun-2013
 		// Test the shit out of this. This is the important,
 		// meaty part.
+		// ---------------------------------------------------------
 		var eventNode = function(event, parentNode) {
 			return {
 				depth: 0,
@@ -435,19 +482,20 @@
 			}
 		} // for (eventIndex ...)
 
+
+
+
 		// ---------------------------------------------------------
 		// Step 3.
 		// Generate event occurrences from the event stacks.
-		renderEventTree(eventLane, eventTree, settings);
-
+		// ---------------------------------------------------------
+		renderEventTree($eventLane, eventTree, settings);
 	};
 
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * renderEventTree
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
 	 var renderEventTree = function(eventLane, eventTree, settings) {
@@ -559,28 +607,21 @@
 
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * renderLaneColumn
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
 	 var renderLaneColumn = function($laneColumn, eventData, settings) {
 
-	 	var $groups = $(eventData.subgroups);
-
-	 	//
-	 	//
-	 	//
-	 	//
+	 	var $groups = $(eventData.groups);
 	 	$groups.each(function(groupIndex, group) {
 	 		var $groupDiv = jQuery("<div/>", {class: "grouping"});
 
 	 		// Render the group headers if enabled
 	 		if (group.displayHeader) {
-	 			var $groupLane = jQuery("<div/>", {class: "subgroup-lane"});
+	 			var $groupLane = jQuery("<div/>", {class: "group-lane"});
 	 			
-	 			var groupLabelClass = "subgroup-label";
+	 			var groupLabelClass = "group-label";
 	 			if (groupIndex === 0)
 	 			 	groupLabelClass += " first";
 
@@ -589,7 +630,7 @@
 	 				text: group.headerLabel
 	 			});
 
-	 			var $groupSpacer = jQuery("<div/>", {class: "subgroup-spacer"})
+	 			var $groupSpacer = jQuery("<div/>", {class: "group-spacer"})
 	 			$groupLane.append($groupLabel);
 	 			$groupDiv.append($groupLane);
 	 			$groupDiv.append($groupSpacer);
@@ -599,7 +640,7 @@
 	 		var $timeLane = jQuery("<div/>", {class:"time-lane"});
 	 		var timeLabelClass = "time-label border";
 	 		if (group.displayHeader) {
-	 			timeLabelClass += " subgroup";
+	 			timeLabelClass += " group";
 	 		}
 	 		var $timeLabel = jQuery("<div/>", {class: timeLabelClass});
 	 		var $timeSpacer = jQuery("<div/>", {class: "time-spacer"});
@@ -609,7 +650,6 @@
 
 	 		// Render the lane names
 	 		$(group.lanes).each(function(groupIndex, lane) {
-	 			console.log("     lane")
 	 			var $laneDiv = jQuery("<div/>", {class: "lane"});
 	 			var $laneLabel = jQuery("<div/>", {
 	 				class:"lane-label",
@@ -623,13 +663,18 @@
 	 	});
 	 }
 
-
 	/**
+	 * createEventElement
+	 * ----------------------------------------------------------------------------------
+	 * Pretty sloppy looking down there. Simple functionally though. It take an event
+	 * occurence and creates / returns a formatted <div> containing the event details.
 	 *
+	 * Positioning, color and a couple of other options are specified by the caller 
+	 * via the params variable.
 	 *
-	 *
-	 *
-	 *
+	 * ----------------------------------------------------------------------------------
+	 * Sample Event Occurence HTML 
+	 * ----------------------------------------------------------------------------------
 	 *		<div class="event" style="left:450px; height:65px; width:150px;">
 	 *			<div class="event_o service_color_1 type_class">
 	 *				<span class="name_and_time">
@@ -643,19 +688,18 @@
 	 *				</span>
 	 *			</div>	
 	 *		</div>
-	 *
+	 * ----------------------------------------------------------------------------------
 	 */
-	var createEventElement = function(event, config) {
+	var createEventElement = function(event, params) {
 		console.log("    rendering event: "+event.id)
-		console.log("    height: "+config.height+" width: "+config.width+" left: "+config.left+" top: "+config.top)
+		console.log("    height: "+params.height+" width: "+params.width+" left: "+params.left+" top: "+params.top)
 
-		// Extract event details
 		var eventDiv  = jQuery('<div/>', {
 			class: 'event',
-			style: 'top:'+config.top+'; left:'+config.left+'; height:'+config.height+'; width:'+config.width});
+			style: 'top:'+params.top+'; left:'+params.left+'; height:'+params.height+'; width:'+params.width});
 
 		var classString = 'event_o '+'service_color_'+event.serviceColor+' type_'+event.type;
-		if (config.stacked) {
+		if (params.stacked) {
 			classString += ' stacked';
 		}
 		var eventOccurrence = jQuery('<div/>', {
@@ -716,10 +760,12 @@
 
 
 	/**
+	 * renderTimeLane
+	 * ----------------------------------------------------------------------------------
+	 * 
 	 * TODO :: rkim :: 06-Jun-2013
-	 * Make the time lanes work with gutters.
-	 * Time labels are to be fixed to 2 hour divisions wide,
-	 * with paddings to be inserted between them.
+	 * Make the time lanes work with gutters. Time labels are to be  fixed to two cell
+	 * divisions wide with paddings to be inserted between them.
 	 */
 	var renderTimeLane = function($laneGroup, groupData, settings) {
 		
@@ -736,7 +782,7 @@
 			// Build the class string for the time lane
 			var classString = "time-label";
 			if (displayGroupHeaders)
-				classString += " subgroup";
+				classString += " group";
 
 			// 
 			var $timeCell = jQuery("<div/>", {
@@ -769,20 +815,25 @@
 	}
 
 	/**
-	 *
-	 *
-	 *
-	 *
+	 * renderGridLane
+	 * ----------------------------------------------------------------------------------
 	 *
 	 */
-	var renderGridLane = function ($gridLane, settings)
-	{
+	var renderGridLane = function ($gridLane, settings) {
 		var startHour = settings.startTime.getHours();
 		var endHour = settings.endTime.getHours();
 
+		// TODO  :: rkim :: 08-Jun-2013
+		// Though this value is configurable, changing cellsPerHour to anything
+		// other than 2 will cause the solid grid lines to misalign under the 
+		// hour labels.
 		var cellsPerHour = settings.divisionsPerHour;
 		var numberOfCells = (endHour - startHour) * cellsPerHour;
-		numberOfCells += 2;	// For the gutters
+		
+		// Need to add two cells for the gutters - the width for these will
+		// eventually be made configurable, but for now, treat them as regular
+		// grid cells.
+		numberOfCells += 2;
 
 		var gridIndex = 0;
 		var gridClass = "grid start";
@@ -793,8 +844,8 @@
 			// Set class string for the next iteration through
 			//
 			// TODO :: rkim :: 07-Jun-2013
-			// This isn't correct for any value of cellsPerHour
-			// greater than 0.
+			// This logic will need to be adjusted for values of cellsPerHour
+			// greater than 2.
 			if (gridIndex % cellsPerHour !== 0)
 				gridClass += ' mid';
 
