@@ -208,7 +208,7 @@
 		// grouping heirarchy and generate
 		// the calendar.
 		// ---------------------------------------------------------
-		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/groups.events.json')
+		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/events.json')
 
 			// Successfully retrieved event data
 			.done(function(data) {
