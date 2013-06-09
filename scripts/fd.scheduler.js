@@ -67,7 +67,7 @@
  *   maxWidth              : 
  *                         : 
  * ..................................................................................
- *   minWidth              : 
+ *   minWidth              :
  *                         : 
  * ..................................................................................
  *   divisionsPerHour      : 
@@ -109,7 +109,7 @@
 		startTime:new Date(),
 		endTime:new Date()
 	};
-	DEFAULT_SETTINGS.startTime.setHours(6,0,0,0);
+	DEFAULT_SETTINGS.startTime.setHours(1,0,0,0);
 	DEFAULT_SETTINGS.endTime.setHours(20,0,0,0);
 
 	var SETTINGS_KEY = "fdScheduler-Settings";
@@ -121,6 +121,9 @@
 
 	};
 
+	// Globals
+	var scheduleData = null;
+
 	/**
 	 * $.fn.fdScheduler
 	 * ----------------------------------------------------------------------------------
@@ -128,6 +131,7 @@
 	 */
 	$.fn.fdScheduler = function(options) {
 		initializeScheduler.call(this, options);
+
 		return this;
 	};	// end $.fn.frontdeskCalendar
 
@@ -137,6 +141,7 @@
 	 *
 	 */
 	var initializeScheduler = function(options) {
+
 		this.addClass("fdScheduler-enabled").each(function() {
 			var $this = $(this);
 
@@ -147,38 +152,6 @@
 
 			// Extend default settings
 			var settings = $.extend({}, DEFAULT_SETTINGS, options);
-
-			// Handlers for most events that I think will be relevant.
-			// Pretty sure some of these will not be used.
-			settings.events = {
-				touchStart: function(e) {
-
-				},
-				touchMove: function(e) {
-
-				},
-				touchEnd: function(e) {
-
-				},
-				mouseDown: function(e) {
-
-				},
-				mouseMove: function(e) {
-
-				},
-				mouseUp: function(e) {
-
-				},
-				click: function(e) {
-
-				},
-				scroll: function(e) {
-
-				},
-				dragStart: function(e) {
-
-				}
-			};
 
 			// Hardware acceleration
 			$this.data(SETTINGS_KEY, settings);
@@ -194,12 +167,17 @@
 			renderCalendar($this, settings);
 
 			// Bind event Handlers
-			$this.find(".event").click(function(e) {
-				console.log(e.clientX + ", " + e.clientY);
+			bindEventHandlers($this, settings);
+			
+			// Set scroller position
+			$(document).ready(function() {
+				setScrollPosition($this, settings)
 			});
 
 		});	// this.each(function...)
 	}; // initializeScheduler
+
+
 
 	/**
 	 * renderCalendar
@@ -209,18 +187,16 @@
 	var renderCalendar = function($calendar, settings) {
 		var elementId = $calendar.attr("id");
 
-		// Bail for groups for now
-		if (elementId === "groups")
-			return;
-
 		// ---------------------------------------------------------
 		// Setup calendar structure.
 		// ---------------------------------------------------------
+		var $modalBox = jQuery('<div/>', {class:"modal"});
 		var $calendarContainer = jQuery("<div/>", {class: "calendar-container"});
 		var $calendarScroller = jQuery("<div/>", {class: "calendar-scroller"});
 		var $calendarData = jQuery ("<div/>", {class: "calendar-data"});
 		var $laneColumn = jQuery("<div/>", {class: "lane-column"});
 
+	 	$calendar.parent().append($modalBox);
 		$calendar.append($calendarContainer);
 		$calendar.append($laneColumn);
 
@@ -235,9 +211,11 @@
 		jQuery.getJSON('http://dl.dropboxusercontent.com/u/15259292/CalendarLanes/fragments/groups.events.json')
 
 			// Successfully retrieved event data
-			.done(function(eventData) {
+			.done(function(data) {
 				var startDate = settings.startTime;
 				var endDate = settings.endTime;
+
+				scheduleData = data;
 
 				// Parse and massage the data, detect and alert on
 				// errors, etc...
@@ -245,7 +223,7 @@
 				// TODO :: rkim :: 08-Jun-2013
 				// It'd be prudent to break this out into a separate
 				// function better suited to handling error detection.
-				eventData.groups.map(function(group) {
+				scheduleData.groups.map(function(group) {
 					group.lanes.map(function(lane) {
 						lane.events.map(function(event) {
 
@@ -275,8 +253,8 @@
 				settings.endTime = endDate;
 
 				// Render...everything!!
-				renderLaneColumn($laneColumn, eventData, settings);
-				renderLaneGroups($calendarData, eventData, settings);
+				renderLaneColumn($laneColumn, scheduleData, settings);
+				renderLaneGroups($calendarData, scheduleData, settings);
 			})
 
 			// Shit went wrong. What should I do? Fail.
@@ -295,7 +273,7 @@
 	 * ----------------------------------------------------------------------------------
 	 *
 	 */
-	var renderLaneGroups = function($calendarData, eventData, settings) {
+	var renderLaneGroups = function($calendarData, scheduleData, settings) {
 
 		// The lane-group loop...
 		//
@@ -303,7 +281,7 @@
 		// possible given the data structure, but I've no pressing
 		// desire or need to over-complicate the code here for a
 		// possibility.
-		$(eventData.groups).each(function(groupIndex, groupData) {
+		$(scheduleData.groups).each(function(groupIndex, groupData) {
 
 			// Group header
 			var $laneGroup = jQuery("<div/>", {
@@ -316,12 +294,12 @@
 
 			// Render time and calendar lanes
 			renderTimeLane($laneGroup, groupData, settings);
+			renderCurrentTimeMarker($laneGroup, settings);
 			renderCalendarLanes($laneGroup, groupData, settings);
 
 			$calendarData.append($laneGroup);
 		});
 	};
-
 
 	/**
 	 *
@@ -373,9 +351,9 @@
 		// Sort the array of event occurrences. Events will be ordered
 		// by the following criteria:
 		//
-		//    a. earlier event start time
-		//    b. later event end time
-		//    c. event name
+		//    a. earlier start time
+		//    b. later end time
+		//    c. name (optional)
 		//
 		// This is important since much of the following logic relies
 		// on the premise that the events are sorted by time in that
@@ -399,11 +377,6 @@
 		// ---------------------------------------------------------
 		// Step 2.
 		// Construct the "event tree."
-		//
-		// This isn't really a stack. The name serves to describe
-		// the idea that all events in this structure are "stacked"
-		// on top of each other in the calendar due to overlaps in
-		// time.
 		//
 		// TODO :: rkim :: 04-Jun-2013
 		// Test the shit out of this. This is the important,
@@ -483,8 +456,6 @@
 		} // for (eventIndex ...)
 
 
-
-
 		// ---------------------------------------------------------
 		// Step 3.
 		// Generate event occurrences from the event stacks.
@@ -492,17 +463,16 @@
 		renderEventTree($eventLane, eventTree, settings);
 	};
 
-
 	/**
 	 * renderEventTree
 	 * ----------------------------------------------------------------------------------
 	 *
 	 */
-	 var renderEventTree = function(eventLane, eventTree, settings) {
+	 var renderEventTree = function($eventLane, eventTree, settings) {
 	 	var $eventTree = $(eventTree);
 
-	 	// Display config variables;
-	 	var config = {
+	 	// Event rendering parameters
+	 	var eventParams = {
 	 		height: "65px",
 	 		width: "180px",
 			left: "0px",
@@ -563,41 +533,37 @@
 			 	var eventHeight = settings.laneHeight - depthAdjustment;
 			 	eventHeight = eventHeight / stack.events.length;
 
-				// Can't use the startTime since it might not be snapped
-				// to the hour.
-				var calStartTime = new Date();
-				calStartTime.setHours(settings.startTime.getHours(),0,0,0);
 			 	$events = $(eventNode.events);	// jQueryify 
 			 	$events.each(function(eventIndex, event) {
 
 				 	// Set the display config values, render the element
 				 	// and add it to the event lane.
-				 	var eventStartTime = event.startDate;
-				 	var eventEndTime = event.endDate;
-				 	var startOffset = (eventStartTime.getTime() - calStartTime.getTime());
 
-				 	startOffset = startOffset / 1000;
-				 	startOffset = startOffset / 60;
-				 	startOffset = startOffset * pixelsPerMinute + calStartOffset;
-
-				 	// Find length of event in pixels
-				 	var eventLength = eventEndTime.getTime() - eventStartTime.getTime();
-				 	eventLength = eventLength / 1000;
-				 	eventLength = eventLength / 60;
-				 	eventLength = eventLength * pixelsPerMinute;
+					var startOffset = getTimeOffsetInPixels(event.startDate, settings);
+					var eventLength = getTimeOffsetInPixels(event.endDate, settings) - startOffset;
 
 				 	var depthOffset = currentDepth * 5;
 				 	var topOffset = depthOffset+(eventHeight*eventIndex);
 
-				 	// Set config
-			 		config.height = eventHeight.toString()+"px";
-			 		config.top = topOffset.toString()+"px";
-				 	config.left = startOffset.toString()+"px";
-				 	config.width = eventLength.toString()+"px";
-				 	config.stacked = (currentDepth > 0);
 
-				 	var eventElement = createEventElement(event, config);
-				 	eventLane.append(eventElement);
+				 	// Horizontal layout
+				 	if (settings.horizLayout)
+				 	{
+				 		eventParams.height = eventHeight.toString()+"px";
+				 		eventParams.top = topOffset.toString()+"px";
+					 	eventParams.left = startOffset.toString()+"px";
+					 	eventParams.width = eventLength.toString()+"px";
+					 	eventParams.stacked = (currentDepth > 0);
+					 }
+
+					 // Vertical layout
+					 else
+					 {
+					 	// NOT YET IMPLEMENTED
+					 }
+
+				 	var eventElement = createEventElement(event, eventParams);
+				 	$eventLane.append(eventElement);
 			 	}); // $events.each ...
 
 			} // while (eventNodesToRender ...)
@@ -605,16 +571,14 @@
 	 	}); // $eventTree.each
 	 }
 
-
 	/**
 	 * renderLaneColumn
 	 * ----------------------------------------------------------------------------------
 	 *
 	 */
-	 var renderLaneColumn = function($laneColumn, eventData, settings) {
+	 var renderLaneColumn = function($laneColumn, scheduleData, settings) {
 
-	 	var $groups = $(eventData.groups);
-	 	$groups.each(function(groupIndex, group) {
+	 	$(scheduleData.groups).each(function(groupIndex, group) {
 	 		var $groupDiv = jQuery("<div/>", {class: "grouping"});
 
 	 		// Render the group headers if enabled
@@ -745,19 +709,15 @@
 		eventTime.append(spanStartAt);
 		eventTime.append(spanDash);
 		eventTime.append(spanEndAt);
-
 		eventStaff.prepend(eventName);
-
 		eventDetails.append(eventTime);
 		eventDetails.append(eventStaff);
 		eventDetails.append(eventLocation);
-
 		eventOccurrence.append(eventDetails);
 		eventDiv.append(eventOccurrence);
 
 		return eventDiv;
 	}
-
 
 	/**
 	 * renderTimeLane
@@ -852,5 +812,210 @@
 			gridIndex++;
 		}
 	};
+
+	/**
+	 * renderCurrentTimeMarker
+	 * ----------------------------------------------------------------------------------
+	 * Add a marker to the calendar indicating the current time and registers a function
+	 * on a timer to update the position of the marker.
+	 *
+	 */
+	var renderCurrentTimeMarker = function($laneGroup, settings) {
+
+		var currentTime = new Date();
+		if (currentTime.getTime() > settings.endTime.getTime()) {
+			console.log("bailing")
+			return;
+		}
+
+		currentTime.setSeconds(0);
+		currentTime.setMilliseconds(0);
+
+		// Create and add the time marker
+		var pixelOffset = getTimeOffsetInPixels(currentTime, settings);
+		var $timeMarker = jQuery('<div/>', {
+			class: "current-time",
+			style: "left: " + pixelOffset + "px"});
+		$laneGroup.append($timeMarker);
+
+		var updateInterval = 60000;	// 1 minute
+
+		// If the current time occurs before the start of the calendar, set
+		// the initial update interval to the difference in milliseconds
+		// between the current time and the calendar start time by using
+		// the previously determined pixel offset.
+		if (currentTime.getTime() < settings.startTime.getTime()) {
+
+		 	var hourWidth = settings.divisionWidth * settings.divisionsPerHour;
+			var pixelsPerMinute = hourWidth / 60;
+			updateInterval *= (60000 / pixelsPerMinute);
+		}
+
+		// Register update handler. We might want to save this off in case
+		// we need to reference it in the future...
+		setTimeout(function() {
+			updateTimeMarker($timeMarker);
+		}, updateInterval);
+	};
+	var updateTimeMarker = function($timeMarker) {
+
+		// Might be smarter to recalculate the position. This method may
+		// lead to gradual inaccuraccies....but I don't think we care
+		// much.
+		var currentPos = $timeMarker.position().left;
+		$timeMarker.css({"left": currentPos + 2 + "px"});
+
+		console.log("updating time marker: " + (currentPos + 2));
+
+		// TODO :: rkim :: 08-Jun-2013
+		// Should probably add a condition here to stop updating once
+		// the current time advances beyond the range of the calendar.
+		setTimeout(function() {
+			updateTimeMarker($timeMarker);
+		}, 60000);		
+	};
+
+	/**
+	 * getTimeOffsetInPixels
+	 * ----------------------------------------------------------------------------------
+	 *
+	 */
+	var getTimeOffsetInPixels = function(time, settings) {
+
+	 	// Again, this assumes the start and end time occur on the same day
+	 	var startHour = settings.startTime.getHours();
+	 	var endHour = settings.endTime.getHours();
+
+		// TODO :: rkim :: 08-Jun-2013
+		// Compute and store all this at initialization.
+
+	 	var cellsPerHour = settings.divisionsPerHour;
+	 	var minutesPerCell = 60 / cellsPerHour;
+	 	var hourWidth = settings.divisionWidth * cellsPerHour;
+	 	var pixelsPerMinute = hourWidth / 60;
+
+	 	var timeInMilliseconds = time.getTime();
+	 	var startinMilliseconds = settings.startTime.getTime();
+	 	var pixelOffset = timeInMilliseconds - startinMilliseconds;
+	 	//var pixelOffset = (time.getTime() - settings.startTime.getTime());
+
+	 	pixelOffset /= (60000 / pixelsPerMinute);			// to pixels
+	 	pixelOffset += minutesPerCell * pixelsPerMinute;	// gutter width
+
+	 	return pixelOffset;
+	};
+
+	/**
+	 * setScrollPosition
+	 * ----------------------------------------------------------------------------------
+	 *
+	 */
+	var setScrollPosition = function($scheduler, settings) {
+		var $scroller = $scheduler.find('.calendar-scroller');
+
+
+		var currentTime = new Date();
+		var clientWidth = $scroller[0].clientWidth;
+		var scrollerWidth = $scroller[0].scrollWidth - clientWidth;
+
+		// If the current time is out of range, set the scroller
+		// to the middle of the day.
+		if (currentTime.getTime() < settings.startTime.getTime() ||
+			currentTime.getTime() > settings.endTime.getTime()) {
+			$scroller.scrollLeft(scrollerWidth / 2);
+		}
+
+		// Otherwise, center around the time marker
+		else {
+			var timePos = getTimeOffsetInPixels(currentTime, settings);
+			$scroller.scrollLeft(timePos - clientWidth/2);
+		}
+	};
+
+	/**
+	 * bindEventHandlers
+	 * ----------------------------------------------------------------------------------
+	 *
+	 */
+	var bindEventHandlers = function($scheduler, settings) {
+
+		// Handlers for most events that I think will be relevant.
+		// Pretty sure some of these will not be used.
+
+		var handlers = {
+			expandedEvents: [],
+			collapseEvents: function(e) {
+
+				// Skip collapse operation if an event was just
+				// expanded.
+				if (typeof e.eventExpanded != 'undefined' && e.eventExpanded) {
+					return;
+				}
+
+				var expandedEvents = handlers.expandedEvents;
+				while(expandedEvents.length > 0) {
+					var $event = $(expandedEvents.pop());
+					$event.css({"opacity":"1", "pointer-events":"auto"});
+					$event.children('.event_o').children().css({"display":"block"});
+				}
+			}
+		};
+
+		handlers.events = {
+
+			clickHandler: function(e) {
+				var $this = $(this);
+				var xPos = e.clientX;
+				var yPos = e.clientY;
+
+				// Collapse open events before expanding another
+				handlers.collapseEvents(e);
+
+				$this.css({"opacity":"0.3", "pointer-events":"none"});
+				$this.children('.event_o').children().css({"display":"none"});
+				
+				handlers.expandedEvents.push($this);
+				console.log("x: "+xPos+" y: "+yPos);
+
+				e.eventExpanded = true;
+
+				// Figure out where to expand the event
+				//
+				//   1. Default / preferred location is upper left.
+				//   2. Fallback is lower right.
+				//   3. If that doesn't work, try upper right
+				//
+
+
+				// Allow the event to propogate up the DOM.
+			}
+		};
+
+		handlers.scheduler = {
+			clickHandler: function(e) {
+				handlers.collapseEvents(e);
+			}
+		};
+
+
+
+		handlers.grids = {
+
+		};
+
+
+		// Event Occurrences
+		$scheduler.on("click", ".event", handlers.events.clickHandler);
+
+
+		// Calendar Grids
+
+
+		// Scheduler
+		$scheduler.on("click", handlers.collapseEvents);
+
+	}; // bindEventHandlers
+
+
  
 })( jQuery );
