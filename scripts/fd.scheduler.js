@@ -109,8 +109,8 @@
 		startTime:new Date(),
 		endTime:new Date()
 	};
-	DEFAULT_SETTINGS.startTime.setHours(1,0,0,0);
-	DEFAULT_SETTINGS.endTime.setHours(20,0,0,0);
+	DEFAULT_SETTINGS.startTime.setHours(7,0,0,0);
+	DEFAULT_SETTINGS.endTime.setHours(18,0,0,0);
 
 	var SETTINGS_KEY = "fdScheduler-Settings";
 
@@ -157,9 +157,7 @@
 			$this.data(SETTINGS_KEY, settings);
 			if (settings.hardwareAcceleration) {
 				$this.css({
-					"-webkit-transform": "translate3d(0,0,0)",
-					"-webkit-perspective": "1000",
-					"-webkit-backface-visibility": "hidden"
+					"-webkit-transform": "translate3d(0,0,0)"
 				});
 			}
 
@@ -190,18 +188,19 @@
 		// ---------------------------------------------------------
 		// Setup calendar structure.
 		// ---------------------------------------------------------
-		var $modalBox = jQuery('<div/>', {class:"modal"});
+		// var $modalBox = jQuery('<div/>', {class:"modal"});
 		var $calendarContainer = jQuery("<div/>", {class: "calendar-container"});
 		var $calendarScroller = jQuery("<div/>", {class: "calendar-scroller"});
 		var $calendarData = jQuery ("<div/>", {class: "calendar-data"});
 		var $laneColumn = jQuery("<div/>", {class: "lane-column"});
 
-	 	$calendar.parent().append($modalBox);
 		$calendar.append($calendarContainer);
 		$calendar.append($laneColumn);
 
 		$calendarContainer.append($calendarScroller);
 		$calendarScroller.append($calendarData);
+	 	// $calendarScroller.append($modalBox);
+
 
 		// ---------------------------------------------------------
 		// Fetch the EventOccurence data and
@@ -318,6 +317,7 @@
 				id: "calendar-lane-" + laneIndex,
 				class: "calendar-lane"});
 
+
 			// Create and add event lane
 			var $eventLane = jQuery('<div/>', {class: "event-lane"});
 			console.log ("lane: " + laneIndex);
@@ -326,10 +326,13 @@
 			}
 			$calendarLane.append($eventLane);
 
+
+
 			// Create and add grid lane
 			var $gridLane = jQuery("<div/>", {class: "grid-lane"});
 			renderGridLane($gridLane, settings);
 			$calendarLane.append($gridLane);
+
 
 			// Add the new calendar lane to the lane group
 			$laneGroup.append($calendarLane);
@@ -448,10 +451,28 @@
 				lastNode = lastNode.addEvent(event);
 			}
 
-			// Start new layer
 			else {
-				lastNode = eventNode(event, null);
-				eventTree.push(lastNode);
+
+				var nodeAdded = false;
+				var parentNode = lastNode.parent;
+				while (typeof parentNode != 'undefined' && parentNode != null) {
+					if (parentNode.endDate > event.startDate) {
+						lastNode = parentNode.addEvent(event);
+						nodeAdded = true;
+						break;
+					}
+					else
+					{
+						parentNode = parentNode.parent;
+					}
+				}
+
+				// Start new layer
+				if (!nodeAdded)
+				{
+					lastNode = eventNode(event, null);
+					eventTree.push(lastNode);	
+				}
 			}
 		} // for (eventIndex ...)
 
@@ -501,7 +522,6 @@
 
 	 	// Iterate over each 'stack' of events in the tree
 	 	$eventTree.each(function(treeIndex, stack) {
-
 	 		var maxDepth = 0;
 			var eventNodesToProcess = [stack];
 			while (eventNodesToProcess.length > 0) {
@@ -531,7 +551,7 @@
 				// Set height offset by stack depth
 				var depthAdjustment = maxDepth * 5;
 			 	var eventHeight = settings.laneHeight - depthAdjustment;
-			 	eventHeight = eventHeight / stack.events.length;
+			 	eventHeight = eventHeight / eventNode.events.length;
 
 			 	$events = $(eventNode.events);	// jQueryify 
 			 	$events.each(function(eventIndex, event) {
@@ -862,17 +882,19 @@
 		// Might be smarter to recalculate the position. This method may
 		// lead to gradual inaccuraccies....but I don't think we care
 		// much.
-		var currentPos = $timeMarker.position().left;
-		$timeMarker.css({"left": currentPos + 2 + "px"});
+		var currentPos = $timeMarker.position().left + 2;
+		$timeMarker.css({"left": currentPos + "px"});
 
-		console.log("updating time marker: " + (currentPos + 2));
+		console.log("updating time marker: " + currentPos);
 
-		// TODO :: rkim :: 08-Jun-2013
-		// Should probably add a condition here to stop updating once
-		// the current time advances beyond the range of the calendar.
-		setTimeout(function() {
-			updateTimeMarker($timeMarker);
-		}, 60000);		
+		// Make sure the current position of the time marker is scrolled
+		// off the page before turning off the marker update callback.
+		var scrollWidth = $timeMarker.parents(".calendar-scroller")[0].scrollWidth;
+		if (scrollWidth > currentPos + 2) {
+			setTimeout(function() {
+				updateTimeMarker($timeMarker);
+			}, 60000);
+		}
 	};
 
 	/**
@@ -943,7 +965,8 @@
 		// Pretty sure some of these will not be used.
 
 		var handlers = {
-			expandedEvents: [],
+			expandedEvent: null,
+			modalBox: null,
 			collapseEvents: function(e) {
 
 				// Skip collapse operation if an event was just
@@ -951,12 +974,19 @@
 				if (typeof e.eventExpanded != 'undefined' && e.eventExpanded) {
 					return;
 				}
+				
+				// Remove modal box
+				if (handlers.modalBox != null) {
+					handlers.modalBox.remove();
+				}
 
 				var expandedEvents = handlers.expandedEvents;
-				while(expandedEvents.length > 0) {
-					var $event = $(expandedEvents.pop());
+				if (handlers.expandedEvent != null) {
+					var $event = $(handlers.expandedEvent);
 					$event.css({"opacity":"1", "pointer-events":"auto"});
 					$event.children('.event_o').children().css({"display":"block"});
+
+					handlers.expandedEvent = null;
 				}
 			}
 		};
@@ -970,33 +1000,92 @@
 
 				// Collapse open events before expanding another
 				handlers.collapseEvents(e);
-
-				$this.css({"opacity":"0.3", "pointer-events":"none"});
-				$this.children('.event_o').children().css({"display":"none"});
 				
-				handlers.expandedEvents.push($this);
-				console.log("x: "+xPos+" y: "+yPos);
-
+				// Mark current event as expanded
+				handlers.expandedEvent = $this;
 				e.eventExpanded = true;
 
-				// Figure out where to expand the event
-				//
-				//   1. Default / preferred location is upper left.
-				//   2. Fallback is lower right.
-				//   3. If that doesn't work, try upper right
-				//
+				// Create popup
+				var evPos = $this.position();
+				var evOffset = $this.offset();
+
+				var evHeight = $this.height();
+				var evWidth = $this.width();
+
+				var $modalBox = jQuery("<div/>", {
+					class: "event popup",
+					style: "height:"+evHeight+"px;width:"+evWidth+"px;left:"+evOffset.left+"px;top:"+evOffset.top+"px;"
+				});
+				$('.viewport').append($modalBox);
+
+				//$this.parent().append($modalBox);
+
+				handlers.modalBox = $modalBox;
+				$modalBox.html($this.html());
+				$modalBox.children('.event_o').css({"opacity":"1"});
+
+				// Set the original event to transparent
+				$this.css({"opacity":"0.3", "pointer-events":"none"});
+				$this.children('.event_o').children().css({"display":"none"});
 
 
-				// Allow the event to propogate up the DOM.
+
+				// Calculate transition location and size
+				var newHeight = "80px";
+				var newWidth = "200px";
+
+				// The new top and left positions should be calculated based off
+				// the event click location.
+				var clickClientX = e.clientX;
+				var clickClientY = e.clientY;
+				var scrollTop = $(window).scrollTop();
+				var scrollLeft = $(window).scrollLeft();
+
+				var moveX = clickClientX - evOffset.left + scrollLeft  - 205;
+				if (moveX + evOffset.left < scrollLeft) {
+					moveX += 210;
+				}
+
+				var moveY = clickClientY - evOffset.top + scrollTop - 85;
+				if (moveY + evOffset.top < scrollTop) {
+					moveY += 90;
+				}
+
+				// Animate
+				setTimeout(function(){
+					$modalBox.css({
+						"-webkit-transition":"all .3s ease-in-out",
+						"transform":"translate("+moveX+"px,"+moveY+"px)",
+						"height":newHeight,
+						"width":newWidth});
+				}, 50);
+
+
+
+				// Note :: rkim :: 09-Jun-2013
+				// We are allowing the event to progate up through the DOM
 			}
 		};
 
 		handlers.scheduler = {
+			mouseDown: false,
+
 			clickHandler: function(e) {
 				handlers.collapseEvents(e);
+			},
+			mousedownHandler: function(e) {
+				handlers.scheduler.mouseDown = true;
+			},
+			mousemoveHandler: function(e) {
+				if (handlers.scheduler.mouseDown &&
+					handlers.expandedEvent != null) {
+					handlers.collapseEvents(e);
+				}
+			},
+			mouseupHandler: function(e) {
+				handlers.scheduler.mouseDown = false;
 			}
 		};
-
 
 
 		handlers.grids = {
@@ -1013,6 +1102,10 @@
 
 		// Scheduler
 		$scheduler.on("click", handlers.collapseEvents);
+		$scheduler.on("scroll", handlers.collapseEvents);
+		$scheduler.on("mousedown", handlers.scheduler.mousedownHandler);
+		$scheduler.on("mousemove", handlers.scheduler.mousemoveHandler);
+		$scheduler.on("mouseup", handlers.scheduler.mouseupHandler);
 
 	}; // bindEventHandlers
 

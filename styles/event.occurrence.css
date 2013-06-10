@@ -1,13 +1,17 @@
 @charset "US-ASCII";
 
+
+.popup {
+  position:absolute;
+  display:inline;
+  pointer-events:none;
+}
+
 .event {
   position:absolute; 
   display: inline;
   z-index:1;
   padding:0.5px;
-
-  -webkit-perspective: 1000;
-  -webkit-backface-visibility: hidden;
 
   -webkit-transition: opacity .2s ease-in-out;
   -moz-transition: opacity .2s ease-in-out;
@@ -43,7 +47,7 @@
   display: none;
 }
 .event .stacked{
-  opacity:0.9;
+  opacity:0.85;
 }
 .event .type_class:hover,
 .event .type_appointment:hover {
@@ -94,10 +98,6 @@
 
   border: 1px solid #0a729c;
   
-  -webkit-box-shadow: #6ec1e3 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  -moz-box-shadow: #6ec1e3 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  box-shadow: #6ec1e3 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  
   color: #daeff8;
   text-shadow: none;
 }
@@ -111,9 +111,6 @@
   background: -o-linear-gradient(#6fae5e, #63a851);
   background: linear-gradient(#6fae5e, #63a851);
   border: 1px solid #4a7e3c;
-  -webkit-box-shadow: #a1ca96 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  -moz-box-shadow: #a1ca96 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  box-shadow: #a1ca96 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
   
   color: #e7f1e4;
   text-shadow: none;
@@ -128,9 +125,6 @@
   background: -o-linear-gradient(#cf6b6b, #cb5f5f);
   background: linear-gradient(#cf6b6b, #cb5f5f);
   border: 1px solid #984747;
-  -webkit-box-shadow: #df9f9f 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  -moz-box-shadow: #df9f9f 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  box-shadow: #df9f9f 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
   
   color: #f7e7e7;
   text-shadow: none;
@@ -146,9 +140,6 @@
   background: -o-linear-gradient(#d25eb6, #cf51b0);
   background: linear-gradient(#d25eb6, #cf51b0);
   border: 1px solid #9b3c84;
-  -webkit-box-shadow: #e296cf 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  -moz-box-shadow: #e296cf 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
-  box-shadow: #e296cf 0 1px 0 0 inset, rgba(0, 0, 0, 0.4) 0 1px 2px;
   
   color: #f7e4f3;
   text-shadow: none;

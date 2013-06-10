@@ -146,6 +146,7 @@ div {
 .time-lane {
   position:absolute;
   z-index:100;
+  -webkit-transform: translate3d(0,0,0);
 }
 .time-lane .time-label,
 .time-lane .time-padding {
@@ -170,6 +171,7 @@ div {
 /* calendar grid */
 .grid-lane{
   display:table-row;
+  -webkit-transform: translate3d(0,0,-1);
 }
 .grid-lane .grid {
   display:table-cell;
@@ -194,6 +196,8 @@ div {
 .event-lane {
   position:absolute;
   display:table-row;
+  -webkit-transform: translate3d(0,0,0);
+
 }
 .current-time
 {
