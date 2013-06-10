@@ -44,77 +44,11 @@
 			// Attach kinetic scrolling
 			$('.calendar-scroller').kinetic({
 				cursor:'ew-resize',
-				y:false,
+				y:true,
 				maxvelocity: 55,
 				triggerHardware:true
 			});
-
-			// -----------------------------
-			// Event handlers for Front Desk
-			// Scheduler
-			//
-			// All this will eventually get
-			// packaged up into a jQuery plugin.
-			var expandedEvents = new Array();
-			var collapseEvents = function() {
-				if (expandedEvents.length > 0) {	
-					while(expandedEvents.length > 0) {
-						var event = expandedEvents.pop();
-						var $this = $(event);
-
-						$this.prop("expanded", false);
-						$this.css({"opacity":"1", "pointer-events":"auto"});
-						$this.children('.event_o').children().css({"display":"block"});
-					}
-				}
-			}
-
-			// NOTE :: rkim :: 02-Jun-2013
-			// There's a built-in delay to .click that won't work in
-			// touch-enabled devices.  Use.bind('touchstart', ...)
-			// instead.
-			
-			var dragged = false;
-			var mousedown = false;
-			var clientX = 0;
-			var clientY = 0;
-
-			$(".scheduler").click(function(e) {
-				collapseEvents();
-			});
-
-			$(".scheduler").mousedown(function(e) {
-				mousedown = true;
-				clientX = e.clientX;
-				clientY = e.clientY;
-				// bind mousemove
-
-			});
-			$(".scheduler").mousemove(function(e) {
-				if (mousedown) {
-					collapseEvents();
-				}
-			});
-			$(".scheduler").mouseup(function(e) {
-				mousedown = false;
-			});
-
-			$('.scheduler .event').click(function(e){
-
-				$this = $(this);
-				var isExpanded = $this.prop("expanded");
-				if (!isExpanded) 
-				{
-					$this.prop("expanded", true);
-					$this.css({"opacity":"0.3", "pointer-events":"none"});
-					$this.children('.event_o').children().css({"display":"none"});
-
-					expandedEvents.push($this);
-					e.stopPropagation();
-					// bind scheduler.click?
-				}
-			});
-
+		
 		});	// $(document).ready(...)
 		
 	</script>

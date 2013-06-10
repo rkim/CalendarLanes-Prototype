@@ -94,8 +94,8 @@ div {
   -webkit-overflow-scrolling:touch;
 }
 .calendar-data
-{
-  position:relative;
+
+{  position:relative;
   z-index:10;
 }
 
@@ -185,13 +185,6 @@ div {
   border-left:0px;
 }
 
-/*
-.grid:hover{
-  background-color:#daf3ff;
-  opacity:0.5;
-}
-*/  
-
 /* events */
 .event-lane {
   position:absolute;
@@ -201,10 +194,11 @@ div {
 }
 .current-time
 {
-  z-index:1;
+  z-index:-1;
   position:absolute;
   width:3px;
   border:1px solid red;
+  opacity:0.5;
   height:100%;
 }
 
@@ -270,7 +264,7 @@ div {
   width:60px;
   min-width:60px;
   max-width:60px;
-  z-index:-1000;
+  z-index:-1;
 
 }
 

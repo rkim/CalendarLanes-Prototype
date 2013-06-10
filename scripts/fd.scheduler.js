@@ -87,7 +87,7 @@
  * ----------------------------------------------------------------------------------
  *
  */
-
+	$.support.cors = true;
 	var DEFAULT_SETTINGS = {
 		horizLayout: true,
 		gridHoverOn: true,
@@ -123,6 +123,13 @@
 
 	// Globals
 	var scheduleData = null;
+
+
+	// add touch checker to jQuery.support
+    $.support = $.support || {};
+    $.extend($.support, {
+        touch: "ontouchend" in document
+    });
 
 	/**
 	 * $.fn.fdScheduler
@@ -188,7 +195,6 @@
 		// ---------------------------------------------------------
 		// Setup calendar structure.
 		// ---------------------------------------------------------
-		// var $modalBox = jQuery('<div/>', {class:"modal"});
 		var $calendarContainer = jQuery("<div/>", {class: "calendar-container"});
 		var $calendarScroller = jQuery("<div/>", {class: "calendar-scroller"});
 		var $calendarData = jQuery ("<div/>", {class: "calendar-data"});
@@ -199,8 +205,7 @@
 
 		$calendarContainer.append($calendarScroller);
 		$calendarScroller.append($calendarData);
-	 	// $calendarScroller.append($modalBox);
-
+		renderCurrentTimeMarker($calendarData, settings);
 
 		// ---------------------------------------------------------
 		// Fetch the EventOccurence data and
@@ -293,7 +298,6 @@
 
 			// Render time and calendar lanes
 			renderTimeLane($laneGroup, groupData, settings);
-			renderCurrentTimeMarker($laneGroup, settings);
 			renderCalendarLanes($laneGroup, groupData, settings);
 
 			$calendarData.append($laneGroup);
@@ -856,6 +860,7 @@
 		var $timeMarker = jQuery('<div/>', {
 			class: "current-time",
 			style: "left: " + pixelOffset + "px"});
+
 		$laneGroup.append($timeMarker);
 
 		var updateInterval = 60000;	// 1 minute
@@ -964,9 +969,14 @@
 		// Handlers for most events that I think will be relevant.
 		// Pretty sure some of these will not be used.
 
+
+		// ---------------------------------------------------------
+		// Common variables, functions used by event handlers
+		// ---------------------------------------------------------
 		var handlers = {
 			expandedEvent: null,
-			modalBox: null,
+			popup: null,
+
 			collapseEvents: function(e) {
 
 				// Skip collapse operation if an event was just
@@ -975,9 +985,9 @@
 					return;
 				}
 				
-				// Remove modal box
-				if (handlers.modalBox != null) {
-					handlers.modalBox.remove();
+				// Remove popup
+				if (handlers.popup != null) {
+					handlers.popup.remove();
 				}
 
 				var expandedEvents = handlers.expandedEvents;
@@ -991,20 +1001,28 @@
 			}
 		};
 
+
+		// ---------------------------------------------------------
+		// Event Handlers for Event Occurrences
+		// ---------------------------------------------------------
 		handlers.events = {
 
+			// -----------------------------------------------------
+			// Clicking on an event will ... <describe behavior>
+			// -----------------------------------------------------
 			clickHandler: function(e) {
 				var $this = $(this);
-				var xPos = e.clientX;
-				var yPos = e.clientY;
 
-				// Collapse open events before expanding another
-				handlers.collapseEvents(e);
+				// Collapse any open events before expanding another
+				if (handlers.expandedEvent != null){
+					handlers.collapseEvents(e);
+				}
 				
-				// Mark current event as expanded
+				// Mark the current event as expanded
 				handlers.expandedEvent = $this;
 				e.eventExpanded = true;
 
+				// -----------------------------------------------------
 				// Create popup
 				var evPos = $this.position();
 				var evOffset = $this.offset();
@@ -1012,32 +1030,41 @@
 				var evHeight = $this.height();
 				var evWidth = $this.width();
 
-				var $modalBox = jQuery("<div/>", {
+				var $popup = jQuery("<div/>", {
 					class: "event popup",
-					style: "height:"+evHeight+"px;width:"+evWidth+"px;left:"+evOffset.left+"px;top:"+evOffset.top+"px;"
+					style: "height:"+evHeight+"px;width:"+evWidth+"px;left:"+evOffset.left+"px;top:"+evOffset.top+"px;z-index:1000"
 				});
-				$('.viewport').append($modalBox);
+				$('.viewport').append($popup);
 
-				//$this.parent().append($modalBox);
-
-				handlers.modalBox = $modalBox;
-				$modalBox.html($this.html());
-				$modalBox.children('.event_o').css({"opacity":"1"});
+				handlers.popup = $popup;
+				$popup.html($this.html());
+				$popup.children('.event_o').css({"opacity":"1"});
 
 				// Set the original event to transparent
 				$this.css({"opacity":"0.3", "pointer-events":"none"});
 				$this.children('.event_o').children().css({"display":"none"});
 
 
-
+				// -----------------------------------------------------
 				// Calculate transition location and size
 				var newHeight = "80px";
 				var newWidth = "200px";
 
-				// The new top and left positions should be calculated based off
-				// the event click location.
+				// The new top and left positions should be calculated
+				// based off the event click location.
 				var clickClientX = e.clientX;
 				var clickClientY = e.clientY;
+
+				if ($.support.touch) {
+					touch = e.originalEvent.touches[0];
+					clickClientX =  touch.clientX;
+					clickClientY = touch.clientY;
+				}
+
+
+
+				// Need to account for scroll region to determine popup
+				// location
 				var scrollTop = $(window).scrollTop();
 				var scrollLeft = $(window).scrollLeft();
 
@@ -1045,21 +1072,23 @@
 				if (moveX + evOffset.left < scrollLeft) {
 					moveX += 210;
 				}
-
 				var moveY = clickClientY - evOffset.top + scrollTop - 85;
 				if (moveY + evOffset.top < scrollTop) {
 					moveY += 90;
 				}
 
-				// Animate
+				// -----------------------------------------------------
+				// Call transition after a brief timeout
 				setTimeout(function(){
-					$modalBox.css({
+					$popup.css({
+						"-ms-transition":"all .3s ease-in-out",
+						"-moz-transition":"all .3s ease-in-out",
 						"-webkit-transition":"all .3s ease-in-out",
-						"transform":"translate("+moveX+"px,"+moveY+"px)",
+						"transition":"all .3s ease-in-out",
+						"transform":"translate3d("+moveX+"px,"+moveY+"px,0)",
 						"height":newHeight,
 						"width":newWidth});
 				}, 50);
-
 
 
 				// Note :: rkim :: 09-Jun-2013
@@ -1067,6 +1096,9 @@
 			}
 		};
 
+		// ---------------------------------------------------------
+		// Event Handlers for the Scheduler
+		// ---------------------------------------------------------
 		handlers.scheduler = {
 			mouseDown: false,
 
@@ -1088,24 +1120,31 @@
 		};
 
 
-		handlers.grids = {
-
-		};
-
-
 		// Event Occurrences
-		$scheduler.on("click", ".event", handlers.events.clickHandler);
-
+		if ($.support.touch) {
+			$scheduler.on("touchstart", ".event", handlers.events.clickHandler);
+		}
+		else {
+			$scheduler.on("click", ".event", handlers.events.clickHandler);
+		}
 
 		// Calendar Grids
 
 
 		// Scheduler
-		$scheduler.on("click", handlers.collapseEvents);
-		$scheduler.on("scroll", handlers.collapseEvents);
-		$scheduler.on("mousedown", handlers.scheduler.mousedownHandler);
-		$scheduler.on("mousemove", handlers.scheduler.mousemoveHandler);
-		$scheduler.on("mouseup", handlers.scheduler.mouseupHandler);
+		if ($.support.touch) {
+			$scheduler.on("touchstart", handlers.collapseEvents);
+			$scheduler.on("touchstart", handlers.scheduler.mousedownHandler);
+			$scheduler.on("touchmove", handlers.scheduler.mousemoveHandler);
+			$scheduler.on("touchend", handlers.scheduler.mouseupHandler);
+		}
+		else {
+			$scheduler.on("click", handlers.collapseEvents);
+			$scheduler.on("scroll", handlers.collapseEvents);
+			$scheduler.on("mousedown", handlers.scheduler.mousedownHandler);
+			$scheduler.on("mousemove", handlers.scheduler.mousemoveHandler);
+			$scheduler.on("mouseup", handlers.scheduler.mouseupHandler);
+		}
 
 	}; // bindEventHandlers
 
